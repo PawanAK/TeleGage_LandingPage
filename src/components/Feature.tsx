@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 
 import EcosystemIcon from "../assets/icons/ecosystem.svg";
@@ -11,18 +11,19 @@ export const Feature = ({ title, description }: { title: string, description: st
 
     const border = useRef<HTMLDivElement>(null)
 
+    const updateMousePosition = useCallback((e: MouseEvent) => {
+        if (!border.current) return
+        const rect = border.current?.getBoundingClientRect()
+        offsetX.set(e.x - rect.x)
+        offsetY.set(e.y - rect.y)
+    }, [offsetX, offsetY])
+
     useEffect(() => {
-        const updateMousePosition = (e: MouseEvent) => {
-            if (!border.current) return
-            const rect = border.current?.getBoundingClientRect()
-            offsetX.set(e.x - rect.x)
-            offsetY.set(e.y - rect.y)
-        }
         window.addEventListener('mousemove', updateMousePosition)
         return () => {
             window.removeEventListener('mousemove', updateMousePosition)
         }
-    }, [])
+    }, [updateMousePosition])
 
     return (
         <div className="border border-white/30 px-5 py-10 text-center rounded-xl sm:flex-1 relative">

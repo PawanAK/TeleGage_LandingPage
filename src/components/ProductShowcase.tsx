@@ -21,7 +21,7 @@ export const ProductShowcase = () => {
         <h2 className="text-center text-5xl sm:text-6xl font-bold tracking-tighter">Intuitive Interface</h2>
         <div className="max-w-3xl mx-auto">
           <p className="text-center text-white/70 mt-5">
-            TeleGage's user-friendly dashboard makes it easy to manage your Telegram community,
+            TeleGage&apos;s user-friendly dashboard makes it easy to manage your Telegram community,
             track engagement, and distribute rewards seamlessly.
           </p>
         </div>
