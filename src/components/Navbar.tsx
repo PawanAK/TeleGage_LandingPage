@@ -21,6 +21,7 @@ export const Navbar = () => {
             <Link href='/' className='text-white text-opacity-60 hover:text-opacity-100 transition'>How It Works</Link>
             <Link href='/' className='text-white text-opacity-60 hover:text-opacity-100 transition'>Pricing</Link>
             <Link href='/' className='text-white text-opacity-60 hover:text-opacity-100 transition'>Case Studies</Link>
+            <Link href='/auth' className='text-white text-opacity-60 hover:text-opacity-100 transition'>Login / Sign Up</Link>
             <button className='bg-white text-black py-2 px-4 rounded-lg hover:scale-[1.03] transition'>Get TeleGage</button>
           </nav>
         </div>
