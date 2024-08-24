@@ -117,16 +117,25 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
       )}
       
       {(!isLogin || (isLogin && loginMethod === "wallet")) && (
-        <div>
+        <div className="space-y-2">
           <button 
             type="button" 
-            onClick={petraAddress ? disconnect : connectPetra} 
+            onClick={petraAddress ? disconnectPetra : connectPetra} 
             className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-300 overflow-hidden text-ellipsis"
           >
             {petraAddress 
               ? `Connected: ${petraAddress.slice(0, 6)}...${petraAddress.slice(-4)}` 
               : "Connect Petra Wallet"}
           </button>
+          {petraAddress && (
+            <button 
+              type="button" 
+              onClick={disconnectPetra}
+              className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-300"
+            >
+              Disconnect Wallet
+            </button>
+          )}
         </div>
       )}
       
@@ -135,7 +144,6 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
           Connected Address: {petraAddress.slice(0, 6)}...{petraAddress.slice(-4)}
         </div>
       )} */}
-      <button onClick={disconnectPetra}></button>
       
       <button 
         type="submit" 
