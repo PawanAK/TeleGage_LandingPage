@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+// import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     const [username, setUsername] = useState("");
@@ -11,7 +12,8 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     
-    const { connect, disconnect, account, connected } = useWallet();
+    // const { connect, disconnect, account, connected } = useWallet();
+    const router = useRouter();
 
     const getAptosWallet = () => {
         if ('aptos' in window) {
@@ -53,11 +55,15 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
             console.log("Login with wallet successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
+            localStorage.setItem('user', JSON.stringify({ username, walletAddress: petraAddress }));
+            router.push('/dashboard');
           } else {
             const response = await axios.post('http://localhost:3001/api/login', { username, password });
             console.log("Login with credentials successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
+            localStorage.setItem('user', JSON.stringify({ username, walletAddress: petraAddress }));
+            router.push('/dashboard');
           }
         } else {
           if (petraAddress && username && password) {
@@ -65,6 +71,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
             console.log("Sign Up successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
+            localStorage.setItem('user', JSON.stringify({ username, walletAddress: petraAddress }));
           } else {
             setErrorMessage("Please fill all fields and connect wallet for signup");
           }
