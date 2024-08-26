@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
+import { motion } from 'framer-motion';
 
 const DashboardSummary = () => {
   return (
@@ -51,6 +52,7 @@ const CommunityStats = () => {
 
 export default function DashboardPage() {
   const [username, setUsername] = useState('');
+  const [communities, setCommunities] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -59,6 +61,11 @@ export default function DashboardPage() {
       router.push('/auth');
     } else {
       setUsername(JSON.parse(user).username);
+      // Fetch user's communities (mock data for now)
+      setCommunities([
+        { id: 1, name: 'Crypto Enthusiasts' },
+        { id: 2, name: 'NFT Collectors' },
+      ]);
     }
   }, [router]);
 
@@ -85,23 +92,52 @@ export default function DashboardPage() {
         </div>
       </header>
       <main className="container mx-auto mt-8 px-4">
-        <div className="flex justify-center space-x-4 mb-8">
-          <button
-            onClick={() => router.push('/create_community')}
-            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
-          >
-            Create Your Community
-          </button>
-          <button
-            onClick={() => router.push('/import_community')}
-            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
-          >
-            Import Your Community
-          </button>
-        </div>
-        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">Crypto Enthusiasts Community</h2>
-        <DashboardSummary />
-        <CommunityStats />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
+            Welcome to Your Dashboard
+          </h2>
+          <div className="flex justify-center space-x-4 mb-8">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/create_community')}
+              className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
+            >
+              Create Your Community
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/import_community')}
+              className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
+            >
+              Import Your Community
+            </motion.button>
+          </div>
+          {communities.length > 0 ? (
+            communities.map((community) => (
+              <motion.div
+                key={community.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mb-8"
+              >
+                <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
+                  {community.name}
+                </h2>
+                <DashboardSummary />
+                <CommunityStats />
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-center text-xl">You haven't created or imported any communities yet.</p>
+          )}
+        </motion.div>
       </main>
     </div>
   );
