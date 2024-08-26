@@ -31,8 +31,19 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
           console.log("Petra wallet connected, address:", response.address);
           setPetraAddress(response.address);
           localStorage.setItem('petraAddress', response.address);
+          
+          // Attempt to login immediately after connecting if it's a login page
+          if (isLogin) {
+            const loginResponse = await axios.post('http://localhost:3001/api/login', { walletAddress: response.address });
+            console.log("Login with wallet successful", loginResponse.data);
+            setSuccessMessage(loginResponse.data.message);
+            setErrorMessage("");
+            localStorage.setItem('user', JSON.stringify({ walletAddress: response.address }));
+            router.push('/dashboard');
+          }
         } catch (error) {
-          console.error("Failed to connect to Petra wallet:", error);
+          console.error("Failed to connect to Petra wallet or login:", error);
+          setErrorMessage("Failed to connect wallet or login. Please try again.");
         }
       } else {
         window.open('https://petra.app/', '_blank');
@@ -162,7 +173,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
                                 ? `Connected: ${petraAddress.slice(0, 6)}...${petraAddress.slice(-4)}` 
                                 : "Connect Petra Wallet"}
                         </button>
-                        {petraAddress && (
+                        {petraAddress && !isLogin && (
                             <button 
                                 type="button" 
                                 onClick={disconnectPetra}
@@ -176,13 +187,17 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
                 
                 {errorMessage && <div className="text-red-500 text-sm bg-red-100 border border-red-400 rounded-lg p-2">{errorMessage}</div>}
                 {successMessage && <div className="text-green-500 text-sm bg-green-100 border border-green-400 rounded-lg p-2">{successMessage}</div>}
-                <button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
-                    disabled={!isLogin && (!petraAddress || !username || !password)}
-                >
-                    {isLogin ? "Login" : "Sign Up"}
-                </button>
+                
+                {/* Login/Signup button */}
+                {(!isLogin || (isLogin && loginMethod === "credentials")) && (
+                    <button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
+                        disabled={!isLogin && (!petraAddress || !username || !password)}
+                    >
+                        {isLogin ? "Login" : "Sign Up"}
+                    </button>
+                )}
             </form>
         </div>
     );
