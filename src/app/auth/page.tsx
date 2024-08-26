@@ -2,13 +2,28 @@
 import { useState } from "react";
 import { AuthForm } from "@/components/AuthForm";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import logoImg from "@/assets/images/logosaas.png";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
     <div className="bg-black text-white min-h-screen flex items-center justify-center bg-[linear-gradient(to_bottom,#000,#200D42_34%,#4F21A1_65%,#A45EDB_82%)]">
-      <div className="bg-gray-900 p-8 rounded-lg shadow-lg max-w-md w-full">
+      <motion.div 
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-900 p-8 rounded-lg shadow-lg max-w-md w-full"
+      >
+        <motion.div 
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
+          className="flex justify-center mb-6"
+        >
+          <Image src={logoImg} alt="TeleGage Logo" width={80} height={80} />
+        </motion.div>
         <div className="relative mb-8">
           <div className="flex bg-gray-800 p-1 rounded-full">
             <button
@@ -34,8 +49,16 @@ export default function AuthPage() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
         </div>
-        <AuthForm isLogin={isLogin} />
-      </div>
+        <motion.div
+          key={isLogin ? "login" : "signup"}
+          initial={{ opacity: 0, x: isLogin ? -20 : 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: isLogin ? 20 : -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <AuthForm isLogin={isLogin} />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
