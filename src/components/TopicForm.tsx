@@ -102,4 +102,4 @@ export const TopicForm = ({ onSubmit, topics }) => {
       </form>
     </div>
   );
-};
+}

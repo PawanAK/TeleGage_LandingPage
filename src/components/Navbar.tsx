@@ -1,5 +1,4 @@
 import Image from 'next/image';
-
 import logoImg from '../assets/images/logosaas.png';
 import MenuIcon from '../assets/icons/menu.svg';
 import Link from 'next/link';
@@ -22,7 +21,11 @@ export const Navbar = () => {
             <Link href='/' className='text-white text-opacity-60 hover:text-opacity-100 transition'>Pricing</Link>
             <Link href='/' className='text-white text-opacity-60 hover:text-opacity-100 transition'>Case Studies</Link>
             <Link href='/auth' className='text-white text-opacity-60 hover:text-opacity-100 transition'>Login / Sign Up</Link>
-            <button className='bg-white text-black py-2 px-4 rounded-lg hover:scale-[1.03] transition'>Get TeleGage</button>
+            <Link href='/auth'>
+              <button className='bg-white text-black py-2 px-4 rounded-lg hover:scale-[1.03] transition'>
+                Get TeleGage
+              </button>
+            </Link>
           </nav>
         </div>
       </div>
