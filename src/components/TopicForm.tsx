@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 
-export const TopicForm = ({ onSubmit, topics }) => {
-  const [formData, setFormData] = useState({
+interface Topic {
+  topicName: string;
+  topicDescription: string;
+  topicRules: string;
+}
+
+export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => void, topics: Topic[] }) => {
+  const [formData, setFormData] = useState<Topic>({
     topicName: '',
     topicDescription: '',
     topicRules: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(formData);
     setFormData({

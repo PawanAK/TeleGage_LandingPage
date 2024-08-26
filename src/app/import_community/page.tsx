@@ -6,15 +6,15 @@ import { TopicForm } from '@/components/TopicForm';
 export default function ImportCommunityPage() {
   const [step, setStep] = useState(1);
   const [groupLink, setGroupLink] = useState('');
-  const [topics, setTopics] = useState([]);
+  const [topics, setTopics] = useState<any[]>([]); // Change: Use any[] type
   const router = useRouter();
 
-  const handleGroupLinkSubmit = (e) => {
+  const handleGroupLinkSubmit = (e:any) => {
     e.preventDefault();
     setStep(2);
   };
 
-  const handleTopicSubmit = (data) => {
+  const handleTopicSubmit = (data: any) => { // Change: Use any type for data
     setTopics([...topics, data]);
   };
 

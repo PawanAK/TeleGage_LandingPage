@@ -4,6 +4,13 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { FaUser, FaLock, FaWallet } from 'react-icons/fa';
 
+// Add this type declaration at the top of the file, outside of any function
+declare global {
+  interface Window {
+    aptos?: any;
+  }
+}
+
 export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -14,18 +21,24 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     
     const router = useRouter();
 
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
     const getAptosWallet = () => {
-        if ('aptos' in window) {
+        if (isClient && 'aptos' in window) {
           return window.aptos;
         } else {
-          window.open('https://petra.app/', `_blank`);
+          return null;
         }
     };
 
     const wallet = getAptosWallet();
     
     const connectPetra = async () => {
-      if (typeof window !== "undefined" && window.aptos) {
+      if (isClient && window.aptos) {
         try {
           const response = await wallet.connect();
           console.log("Petra wallet connected, address:", response.address);
@@ -110,95 +123,97 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
             <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
                 {isLogin ? "Welcome Back" : "Join Us"}
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {isLogin && (
-                    <div className="flex space-x-4 mb-6">
-                        <button
-                            type="button"
-                            onClick={() => setLoginMethod("credentials")}
-                            className={`flex-1 py-2 px-4 rounded-lg transition-all duration-300 ${loginMethod === "credentials" ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
-                        >
-                            <FaUser className="inline-block mr-2" />
-                            Credentials
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setLoginMethod("wallet")}
-                            className={`flex-1 py-2 px-4 rounded-lg transition-all duration-300 ${loginMethod === "wallet" ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
-                        >
-                            <FaWallet className="inline-block mr-2" />
-                            Wallet
-                        </button>
-                    </div>
-                )}
-                
-                {(!isLogin || (isLogin && loginMethod === "credentials")) && (
-                    <>
-                        <div className="relative">
-                            <FaUser className="absolute top-3 left-3 text-gray-400" />
-                            <input
-                                type="text"
-                                id="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="w-full p-2 pl-10 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
-                                placeholder="Username"
-                                required
-                            />
+            {isClient && (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {isLogin && (
+                        <div className="flex space-x-4 mb-6">
+                            <button
+                                type="button"
+                                onClick={() => setLoginMethod("credentials")}
+                                className={`flex-1 py-2 px-4 rounded-lg transition-all duration-300 ${loginMethod === "credentials" ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                            >
+                                <FaUser className="inline-block mr-2" />
+                                Credentials
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setLoginMethod("wallet")}
+                                className={`flex-1 py-2 px-4 rounded-lg transition-all duration-300 ${loginMethod === "wallet" ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                            >
+                                <FaWallet className="inline-block mr-2" />
+                                Wallet
+                            </button>
                         </div>
-                        <div className="relative">
-                            <FaLock className="absolute top-3 left-3 text-gray-400" />
-                            <input
-                                type="password"
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-2 pl-10 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
-                                placeholder="Password"
-                                required
-                            />
-                        </div>
-                    </>
-                )}
-                
-                {(!isLogin || (isLogin && loginMethod === "wallet")) && (
-                    <div className="space-y-4">
-                        <button 
-                            type="button" 
-                            onClick={petraAddress ? disconnectPetra : connectPetra} 
-                            className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-all duration-300 flex items-center justify-center"
-                        >
-                            <FaWallet className="mr-2" />
-                            {petraAddress 
-                                ? `Connected: ${petraAddress.slice(0, 6)}...${petraAddress.slice(-4)}` 
-                                : "Connect Petra Wallet"}
-                        </button>
-                        {petraAddress && !isLogin && (
+                    )}
+                    
+                    {(!isLogin || (isLogin && loginMethod === "credentials")) && (
+                        <>
+                            <div className="relative">
+                                <FaUser className="absolute top-3 left-3 text-gray-400" />
+                                <input
+                                    type="text"
+                                    id="username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="w-full p-2 pl-10 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                                    placeholder="Username"
+                                    required
+                                />
+                            </div>
+                            <div className="relative">
+                                <FaLock className="absolute top-3 left-3 text-gray-400" />
+                                <input
+                                    type="password"
+                                    id="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full p-2 pl-10 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                                    placeholder="Password"
+                                    required
+                                />
+                            </div>
+                        </>
+                    )}
+                    
+                    {(!isLogin || (isLogin && loginMethod === "wallet")) && (
+                        <div className="space-y-4">
                             <button 
                                 type="button" 
-                                onClick={disconnectPetra}
-                                className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-all duration-300"
+                                onClick={petraAddress ? disconnectPetra : connectPetra} 
+                                className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-all duration-300 flex items-center justify-center"
                             >
-                                Disconnect Wallet
+                                <FaWallet className="mr-2" />
+                                {petraAddress 
+                                    ? `Connected: ${petraAddress.slice(0, 6)}...${petraAddress.slice(-4)}` 
+                                    : "Connect Petra Wallet"}
                             </button>
-                        )}
-                    </div>
-                )}
-                
-                {errorMessage && <div className="text-red-500 text-sm bg-red-100 border border-red-400 rounded-lg p-2">{errorMessage}</div>}
-                {successMessage && <div className="text-green-500 text-sm bg-green-100 border border-green-400 rounded-lg p-2">{successMessage}</div>}
-                
-                {/* Login/Signup button */}
-                {(!isLogin || (isLogin && loginMethod === "credentials")) && (
-                    <button 
-                        type="submit" 
-                        className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
-                        disabled={!isLogin && (!petraAddress || !username || !password)}
-                    >
-                        {isLogin ? "Login" : "Sign Up"}
-                    </button>
-                )}
-            </form>
+                            {petraAddress && !isLogin && (
+                                <button 
+                                    type="button" 
+                                    onClick={disconnectPetra}
+                                    className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-all duration-300"
+                                >
+                                    Disconnect Wallet
+                                </button>
+                            )}
+                        </div>
+                    )}
+                    
+                    {errorMessage && <div className="text-red-500 text-sm bg-red-100 border border-red-400 rounded-lg p-2">{errorMessage}</div>}
+                    {successMessage && <div className="text-green-500 text-sm bg-green-100 border border-green-400 rounded-lg p-2">{successMessage}</div>}
+                    
+                    {/* Login/Signup button */}
+                    {(!isLogin || (isLogin && loginMethod === "credentials")) && (
+                        <button 
+                            type="submit" 
+                            className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
+                            disabled={!isLogin && (!petraAddress || !username || !password)}
+                        >
+                            {isLogin ? "Login" : "Sign Up"}
+                        </button>
+                    )}
+                </form>
+            )}
         </div>
     );
 };

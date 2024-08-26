@@ -1,17 +1,27 @@
-import { useState } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 
-export const CommunityForm = ({ onSubmit }) => {
-  const [formData, setFormData] = useState({
+interface FormData {
+  telegramUsername: string;
+  communityName: string;
+  communityDescription: string;
+}
+
+interface CommunityFormProps {
+  onSubmit: (data: FormData) => void;
+}
+
+export const CommunityForm = ({ onSubmit }: CommunityFormProps) => {
+  const [formData, setFormData] = useState<FormData>({
     telegramUsername: '',
     communityName: '',
     communityDescription: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(formData);
   };

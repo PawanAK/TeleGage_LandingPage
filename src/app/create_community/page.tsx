@@ -6,16 +6,16 @@ import { TopicForm } from '@/components/TopicForm';
 
 export default function CreateCommunityPage() {
   const [step, setStep] = useState(1);
-  const [communityData, setCommunityData] = useState({});
-  const [topics, setTopics] = useState([]);
+  const [communityData, setCommunityData] = useState<any>({});
+  const [topics, setTopics] = useState<any[]>([]);
   const router = useRouter();
 
-  const handleCommunitySubmit = (data) => {
+  const handleCommunitySubmit = (data: any) => {
     setCommunityData(data);
     setStep(2);
   };
 
-  const handleTopicSubmit = (data) => {
+  const handleTopicSubmit = (data: any) => {
     setTopics([...topics, data]);
   };
 

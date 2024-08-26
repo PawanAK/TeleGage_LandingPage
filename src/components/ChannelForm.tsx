@@ -1,18 +1,29 @@
-import { useState } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 
-export const ChannelForm = ({ onSubmit }) => {
-  const [formData, setFormData] = useState({
+interface FormData {
+  channelName: string;
+  channelRules: string;
+  rewards: string;
+  consequences: string;
+}
+
+interface ChannelFormProps {
+  onSubmit: (data: FormData) => void;
+}
+
+export const ChannelForm = ({ onSubmit }: ChannelFormProps) => {
+  const [formData, setFormData] = useState<FormData>({
     channelName: '',
     channelRules: '',
     rewards: '',
     consequences: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(formData);
     setFormData({
