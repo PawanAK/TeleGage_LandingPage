@@ -6,45 +6,45 @@ interface Community {
   title: string;
   memberCount: number;
   messageCount: number;
-  activeUsers: number;
-  moderationActions: number;
 }
-
+  moderationActions: number;
 export const Communities = () => {
-  const [communities, setCommunities] = useState<Community[]>([
-    { id: '1', title: 'Crypto Enthusiasts', memberCount: 5000, messageCount: 150000, activeUsers: 1200, moderationActions: 50 },
-    { id: '2', title: 'NFT Collectors', memberCount: 3000, messageCount: 80000, activeUsers: 800, moderationActions: 30 },
-    { id: '3', title: 'DeFi Traders', memberCount: 2000, messageCount: 100000, activeUsers: 950, moderationActions: 40 },
-    { id: '4', title: 'Blockchain Developers', memberCount: 1500, messageCount: 50000, activeUsers: 600, moderationActions: 20 },
-  ]);
-
-  return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+  const [communities, setCommunities] = useState<Community[]>([]);
+export const Communities = () => {
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/communities');
+        setCommunities(response.data);
+      } catch (error) {
+        console.error('Failed to fetch communities:', error);
+      }
+    };
       <h2 className="text-2xl font-bold mb-4">Your Communities</h2>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
+    fetchCommunities();
+  }, []);
           <thead>
-            <tr className="bg-gray-700">
-              <th className="p-3">Title</th>
-              <th className="p-3">Members</th>
-              <th className="p-3">Messages</th>
-              <th className="p-3">Active Users</th>
-              <th className="p-3">Moderation Actions</th>
+  return (
+    <div>
+      <h2>Your Communities</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Members</th>
+            <th>Messages</th>
+          </tr>
+        </thead>
+        <tbody>
+          {communities.map((community) => (
+            <tr key={community.id}>
+              <td>{community.title}</td>
+              <td>{community.memberCount}</td>
+              <td>{community.messageCount}</td>
             </tr>
-          </thead>
-          <tbody>
-            {communities.map((community) => (
-              <tr key={community.id} className="border-b border-gray-700">
-                <td className="p-3">{community.title}</td>
-                <td className="p-3">{community.memberCount.toLocaleString()}</td>
-                <td className="p-3">{community.messageCount.toLocaleString()}</td>
-                <td className="p-3">{community.activeUsers.toLocaleString()}</td>
-                <td className="p-3">{community.moderationActions}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
