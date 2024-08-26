@@ -85,6 +85,20 @@ export default function DashboardPage() {
         </div>
       </header>
       <main className="container mx-auto mt-8 px-4">
+        <div className="flex justify-center space-x-4 mb-8">
+          <button
+            onClick={() => router.push('/create_community')}
+            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
+          >
+            Create Your Community
+          </button>
+          <button
+            onClick={() => router.push('/import_community')}
+            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
+          >
+            Import Your Community
+          </button>
+        </div>
         <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">Crypto Enthusiasts Community</h2>
         <DashboardSummary />
         <CommunityStats />
