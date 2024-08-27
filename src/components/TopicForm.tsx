@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHashtag, FaInfoCircle, FaList, FaPlus, FaTimes } from 'react-icons/fa';
 
@@ -10,30 +10,17 @@ interface Topic {
 }
 
 interface TopicFormProps {
-  onSubmit: (data: Topic) => void;
+  onSubmit: (data: Topic, index?: number) => void;
   topics: Topic[];
   onRemove: (index: number) => void;
-  receivedTopics: { Name: string; id: number }[];
 }
 
-export const TopicForm = ({ onSubmit, topics, onRemove, receivedTopics }: TopicFormProps) => {
+export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
   const [formData, setFormData] = useState<Topic>({
     topicName: '',
     topicRules: '',
     topicInstructions: '',
   });
-
-  useEffect(() => {
-    if (receivedTopics.length > 0 && topics.length === 0) {
-      const initialTopics = receivedTopics.map(topic => ({
-        topicName: topic.Name,
-        topicRules: '',
-        topicInstructions: '',
-        id: topic.id
-      }));
-      initialTopics.forEach(topic => onSubmit(topic));
-    }
-  }, [receivedTopics, topics, onSubmit]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,9 +33,8 @@ export const TopicForm = ({ onSubmit, topics, onRemove, receivedTopics }: TopicF
   };
 
   const handleEdit = (index: number, field: string, value: string) => {
-    const updatedTopics = [...topics];
-    updatedTopics[index] = { ...updatedTopics[index], [field]: value };
-    onSubmit(updatedTopics[index], index);
+    const updatedTopic = { ...topics[index], [field]: value };
+    onSubmit(updatedTopic, index);
   };
 
   return (
@@ -126,7 +112,7 @@ export const TopicForm = ({ onSubmit, topics, onRemove, receivedTopics }: TopicF
 
       {topics.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg font-semibold text-indigo-300 mb-2">Added Topics</h3>
+          <h3 className="text-lg font-semibold text-indigo-300 mb-2">Topics</h3>
           <div className="bg-gray-900 rounded-lg overflow-hidden">
             <table className="w-full text-sm">
               <thead>

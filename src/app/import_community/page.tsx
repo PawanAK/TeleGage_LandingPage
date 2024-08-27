@@ -46,7 +46,13 @@ export default function ImportCommunityPage() {
       console.log(data.code);
 
       if (data.code === 200) {
-        setReceivedTopics(data.Topics || []); // Assuming Topics is an array in the response
+        const initialTopics = data.Topics.map(topic => ({
+          topicName: topic.Name,
+          topicRules: '',
+          topicInstructions: '',
+          id: topic.id
+        }));
+        setTopics(initialTopics);
         setStep(2);
       } else {
         setShowModal(true);
