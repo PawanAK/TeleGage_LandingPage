@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHashtag, FaInfoCircle, FaList, FaPlus, FaTimes } from 'react-icons/fa';
 
@@ -6,20 +6,34 @@ interface Topic {
   topicName: string;
   topicRules: string;
   topicInstructions: string;
+  id?: number;
 }
 
 interface TopicFormProps {
-  onSubmit: (data: Topic) => void;
+  onSubmit: (data: Topic, index?: number) => void;
   topics: Topic[];
   onRemove: (index: number) => void;
+  receivedTopics: { Name: string; id: number }[];
 }
 
-export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
+export const TopicForm = ({ onSubmit, topics, onRemove, receivedTopics }: TopicFormProps) => {
   const [formData, setFormData] = useState<Topic>({
     topicName: '',
     topicRules: '',
     topicInstructions: '',
   });
+
+  useEffect(() => {
+    if (receivedTopics.length > 0 && topics.length === 0) {
+      const initialTopics = receivedTopics.map(topic => ({
+        topicName: topic.Name,
+        topicRules: '',
+        topicInstructions: '',
+        id: topic.id
+      }));
+      initialTopics.forEach(topic => onSubmit(topic));
+    }
+  }, [receivedTopics, topics, onSubmit]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,6 +43,12 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
     e.preventDefault();
     onSubmit(formData);
     setFormData({ topicName: '', topicRules: '', topicInstructions: '' });
+  };
+
+  const handleEdit = (index: number, field: string, value: string) => {
+    const updatedTopics = [...topics];
+    updatedTopics[index] = { ...updatedTopics[index], [field]: value };
+    onSubmit(updatedTopics[index], index);
   };
 
   return (
@@ -129,8 +149,22 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
                       className="border-b border-gray-700"
                     >
                       <td className="px-2 py-1 text-white">{topic.topicName}</td>
-                      <td className="px-2 py-1 text-white">{topic.topicRules}</td>
-                      <td className="px-2 py-1 text-white">{topic.topicInstructions}</td>
+                      <td className="px-2 py-1">
+                        <input
+                          type="text"
+                          value={topic.topicRules}
+                          onChange={(e) => handleEdit(index, 'topicRules', e.target.value)}
+                          className="w-full bg-gray-800 text-white p-1 rounded border border-gray-700 focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+                        />
+                      </td>
+                      <td className="px-2 py-1">
+                        <input
+                          type="text"
+                          value={topic.topicInstructions}
+                          onChange={(e) => handleEdit(index, 'topicInstructions', e.target.value)}
+                          className="w-full bg-gray-800 text-white p-1 rounded border border-gray-700 focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+                        />
+                      </td>
                       <td className="px-2 py-1">
                         <button
                           onClick={() => onRemove(index)}
