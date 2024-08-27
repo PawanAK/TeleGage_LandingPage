@@ -7,15 +7,17 @@ interface Topic {
   topicRules: string;
   topicInstructions: string;
   id?: number;
+  status?: string;
 }
 
 interface TopicFormProps {
-  onSubmit: (data: Topic, index?: number) => void;
+  onSubmit: (data: Topic) => void;
   topics: Topic[];
   onRemove: (index: number) => void;
+  onEdit: (index: number, updatedTopic: Topic) => void;
 }
 
-export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
+export const TopicForm = ({ onSubmit, topics, onRemove, onEdit }: TopicFormProps) => {
   const [formData, setFormData] = useState<Topic>({
     topicName: '',
     topicRules: '',
@@ -28,13 +30,13 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({ ...formData, status: 'New' });
     setFormData({ topicName: '', topicRules: '', topicInstructions: '' });
   };
 
   const handleEdit = (index: number, field: string, value: string) => {
     const updatedTopic = { ...topics[index], [field]: value };
-    onSubmit(updatedTopic, index);
+    onEdit(index, updatedTopic);
   };
 
   return (

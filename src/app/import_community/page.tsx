@@ -5,15 +5,22 @@ import { TopicForm } from '@/components/TopicForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft, FaCheck, FaTelegram } from 'react-icons/fa';
 
+interface Topic {
+  topicName: string;
+  topicRules: string;
+  topicInstructions: string;
+  id?: number;
+  status?: string;
+}
+
 export default function ImportCommunityPage() {
   const [step, setStep] = useState(1);
   const [groupLink, setGroupLink] = useState('');
-  const [topics, setTopics] = useState<any[]>([]);
-  const [showModal, setShowModal] = useState(true);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [showModal, setShowModal] = useState(false);
   const [communityRules, setCommunityRules] = useState('');
   const [communityInstructions, setCommunityInstructions] = useState('');
   const [isValidating, setIsValidating] = useState(false);
-  const [receivedTopics, setReceivedTopics] = useState<any[]>([]);
   const router = useRouter();
 
   const handleGroupLinkSubmit = async (e: React.FormEvent) => {
@@ -42,15 +49,14 @@ export default function ImportCommunityPage() {
 
       const data = await response.json();
       console.log(data);
-      console.log(data.Topics);
-      console.log(data.code);
 
       if (data.code === 200) {
-        const initialTopics = data.Topics.map(topic => ({
+        const initialTopics = data.Topics.map((topic: any) => ({
           topicName: topic.Name,
           topicRules: '',
           topicInstructions: '',
-          id: topic.id
+          id: topic.id,
+          status: 'Old'
         }));
         setTopics(initialTopics);
         setStep(2);
@@ -65,8 +71,7 @@ export default function ImportCommunityPage() {
     }
   };
   
-
-  const handleTopicSubmit = (data: any) => {
+  const handleTopicSubmit = (data: Topic) => {
     setTopics([...topics, data]);
   };
 
@@ -74,15 +79,56 @@ export default function ImportCommunityPage() {
     setTopics(topics.filter((_, i) => i !== index));
   };
 
+  const handleTopicEdit = (index: number, updatedTopic: Topic) => {
+    const newTopics = [...topics];
+    newTopics[index] = updatedTopic;
+    setTopics(newTopics);
+  };
+
   const handleFinish = async () => {
-    console.log('Group Link:', groupLink);
-    console.log('Topics:', topics);
-    router.push('/dashboard');
+    const channelIdMatch = groupLink.match(/\/c\/(\d+)/);
+    const channelId = channelIdMatch ? channelIdMatch[1] : null;
+
+    const requestData = {
+      telegram_channel_username: channelId,
+      telegram_channel_rules: communityRules,
+      telegram_channel_instructions: communityInstructions,
+      topics: topics.map(topic => ({
+        Name: topic.topicName,
+        Status: topic.status || 'New',
+        ID: topic.id,
+        Rules: topic.topicRules,
+        Instructions: topic.topicInstructions,
+      })),
+    };
+
+    console.log(requestData);
+    try {
+      console.log("Request Data:", requestData);
+      const response = await fetch('http://10.70.18.32:5000/import_channel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        console.log('Telegram channel updated successfully');
+        router.push('/dashboard');
+      } else {
+        console.error('Failed to update Telegram channel');
+        // Handle error (e.g., show error message to user)
+      }
+    } catch (error) {
+      console.error('Error updating Telegram channel:', error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   const progressPercentage = step === 1 ? 50 : 100;
 
-  const Modal = ({ onClose }) => (
+  const Modal = ({ onClose }: { onClose: () => void }) => (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -195,7 +241,12 @@ export default function ImportCommunityPage() {
               </form>
             ) : (
               <>
-                <TopicForm onSubmit={handleTopicSubmit} topics={topics} onRemove={handleTopicRemove} receivedTopics={receivedTopics} />
+                <TopicForm 
+                  onSubmit={handleTopicSubmit} 
+                  topics={topics} 
+                  onRemove={handleTopicRemove}
+                  onEdit={handleTopicEdit}
+                />
                 <div className="mt-4 flex justify-between">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
