@@ -26,9 +26,40 @@ export default function CreateCommunityPage() {
   };
 
   const handleFinish = async () => {
-    console.log('Community Data:', communityData);
-    console.log('Topics:', topics);
-    router.push('/dashboard');
+    const requestData = {
+      telegram_channel_title: communityData.communityName,
+      telegram_channel_description: communityData.communityDescription,
+      telegram_admin_id: communityData.telegramUsername,
+      telegram_channel_rules: communityData.communityRules,
+      telegram_channel_instructions: communityData.communityInstructions,
+      topics: topics.map(topic => ({
+        Name: topic.topicName,
+        Rules: topic.topicRules,
+        Instructions: topic.topicInstructions
+      }))
+    };
+
+    console.log(requestData);
+    try {
+      const response = await fetch('http://10.70.18.32:5000/create_telegram_channel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        console.log('Telegram channel created successfully');
+        router.push('/dashboard');
+      } else {
+        console.error('Failed to create Telegram channel');
+        // Handle error (e.g., show error message to user)
+      }
+    } catch (error) {
+      console.error('Error creating Telegram channel:', error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   const progressPercentage = step === 1 ? 50 : 100;

@@ -4,8 +4,8 @@ import { FaHashtag, FaInfoCircle, FaList, FaPlus, FaTimes } from 'react-icons/fa
 
 interface Topic {
   topicName: string;
-  topicDescription: string;
   topicRules: string;
+  topicInstructions: string;
 }
 
 interface TopicFormProps {
@@ -17,8 +17,8 @@ interface TopicFormProps {
 export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
   const [formData, setFormData] = useState<Topic>({
     topicName: '',
-    topicDescription: '',
     topicRules: '',
+    topicInstructions: '',
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +28,7 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(formData);
-    setFormData({ topicName: '', topicDescription: '', topicRules: '' });
+    setFormData({ topicName: '', topicRules: '', topicInstructions: '' });
   };
 
   return (
@@ -44,7 +44,7 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
           <div>
             <label htmlFor="topicName" className="block text-sm font-semibold text-indigo-300 mb-1">
               <FaHashtag className="inline-block mr-2" />
-              Topic Name
+              Name
             </label>
             <input
               type="text"
@@ -55,22 +55,6 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
               required
               className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
               placeholder="Enter topic name"
-            />
-          </div>
-          <div>
-            <label htmlFor="topicDescription" className="block text-sm font-semibold text-indigo-300 mb-1">
-              <FaInfoCircle className="inline-block mr-2" />
-              Description
-            </label>
-            <input
-              type="text"
-              name="topicDescription"
-              id="topicDescription"
-              value={formData.topicDescription}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
-              placeholder="Brief description"
             />
           </div>
           <div>
@@ -87,6 +71,22 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
               required
               className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
               placeholder="Topic rules"
+            />
+          </div>
+          <div>
+            <label htmlFor="topicInstructions" className="block text-sm font-semibold text-indigo-300 mb-1">
+              <FaInfoCircle className="inline-block mr-2" />
+              Instructions
+            </label>
+            <input
+              type="text"
+              name="topicInstructions"
+              id="topicInstructions"
+              value={formData.topicInstructions}
+              onChange={handleChange}
+              required
+              className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
+              placeholder="Topic instructions"
             />
           </div>
         </div>
@@ -111,9 +111,9 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-800">
-                  <th className="px-2 py-1 text-left text-indigo-300">Topic Name</th>
-                  <th className="px-2 py-1 text-left text-indigo-300">Description</th>
+                  <th className="px-2 py-1 text-left text-indigo-300">Name</th>
                   <th className="px-2 py-1 text-left text-indigo-300">Rules</th>
+                  <th className="px-2 py-1 text-left text-indigo-300">Instructions</th>
                   <th className="px-2 py-1 text-left text-indigo-300">Actions</th>
                 </tr>
               </thead>
@@ -129,8 +129,8 @@ export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
                       className="border-b border-gray-700"
                     >
                       <td className="px-2 py-1 text-white">{topic.topicName}</td>
-                      <td className="px-2 py-1 text-white">{topic.topicDescription}</td>
                       <td className="px-2 py-1 text-white">{topic.topicRules}</td>
+                      <td className="px-2 py-1 text-white">{topic.topicInstructions}</td>
                       <td className="px-2 py-1">
                         <button
                           onClick={() => onRemove(index)}
