@@ -10,7 +10,7 @@ interface Topic {
 }
 
 interface TopicFormProps {
-  onSubmit: (data: Topic, index?: number) => void;
+  onSubmit: (data: Topic) => void;
   topics: Topic[];
   onRemove: (index: number) => void;
   receivedTopics: { Name: string; id: number }[];
@@ -141,7 +141,7 @@ export const TopicForm = ({ onSubmit, topics, onRemove, receivedTopics }: TopicF
                 <AnimatePresence>
                   {topics.map((topic, index) => (
                     <motion.tr
-                      key={index}
+                      key={topic.id || index}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}

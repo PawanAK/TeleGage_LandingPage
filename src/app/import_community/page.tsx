@@ -20,6 +20,7 @@ export default function ImportCommunityPage() {
     e.preventDefault();
     setIsValidating(true);
   
+    // Extract the channel ID from the URL
     const channelIdMatch = groupLink.match(/\/c\/(\d+)/);
     const channelId = channelIdMatch ? channelIdMatch[1] : null;
   
@@ -30,27 +31,23 @@ export default function ImportCommunityPage() {
       return;
     }
   
+    console.log(channelId);
+  
     try {
       const response = await fetch('http://10.70.18.32:5000/get_topics_by_community', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ telegram_channel_id: channelId }),
+        body: JSON.stringify({ telegram_channel_username: channelId }),
       });
-  
-      if (response.ok) {
-        const data = await response.json();
-        if (data.code === 200) {
-          const initialTopics = data.Topics.map(topic => ({
-            topicName: topic.Name,
-            topicRules: '',
-            topicInstructions: '',
-            id: topic.id
-          }));
-          setTopics(initialTopics);
-          setStep(2);
-        } else {
-          setShowModal(true);
-        }
+
+      const data = await response.json();
+      console.log(data);
+      console.log(data.Topics);
+      console.log(data.code);
+
+      if (data.code === 200) {
+        setReceivedTopics(data.Topics || []); // Assuming Topics is an array in the response
+        setStep(2);
       } else {
         setShowModal(true);
       }
@@ -61,15 +58,10 @@ export default function ImportCommunityPage() {
       setIsValidating(false);
     }
   };
+  
 
-  const handleTopicSubmit = (data: any, index?: number) => {
-    if (index !== undefined) {
-      const updatedTopics = [...topics];
-      updatedTopics[index] = data;
-      setTopics(updatedTopics);
-    } else {
-      setTopics([...topics, data]);
-    }
+  const handleTopicSubmit = (data: any) => {
+    setTopics([...topics, data]);
   };
 
   const handleTopicRemove = (index: number) => {
@@ -77,37 +69,9 @@ export default function ImportCommunityPage() {
   };
 
   const handleFinish = async () => {
-    const requestData = {
-      telegram_channel_id: groupLink.match(/\/c\/(\d+)/)?.[1],
-      telegram_channel_rules: communityRules,
-      telegram_channel_instructions: communityInstructions,
-      topics: topics.map(topic => ({
-        Name: topic.topicName,
-        Rules: topic.topicRules,
-        Instructions: topic.topicInstructions
-      }))
-    };
-
-    try {
-      const response = await fetch('http://10.70.18.32:5000/update_telegram_channel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (response.ok) {
-        console.log('Telegram channel updated successfully');
-        router.push('/dashboard');
-      } else {
-        console.error('Failed to update Telegram channel');
-        // Handle error (e.g., show error message to user)
-      }
-    } catch (error) {
-      console.error('Error updating Telegram channel:', error);
-      // Handle error (e.g., show error message to user)
-    }
+    console.log('Group Link:', groupLink);
+    console.log('Topics:', topics);
+    router.push('/dashboard');
   };
 
   const progressPercentage = step === 1 ? 50 : 100;
@@ -177,7 +141,7 @@ export default function ImportCommunityPage() {
                     onChange={(e) => setGroupLink(e.target.value)}
                     required
                     className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
-                    placeholder="https://t.me/c/2169163814/1"
+                    placeholder="https://t.me/your_group_link"
                   />
                 </div>
                 <div>
