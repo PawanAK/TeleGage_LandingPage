@@ -30,7 +30,7 @@ export const TopicForm = ({ onSubmit, topics, onRemove, onEdit }: TopicFormProps
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({ ...formData, status: 'New' });
+    onSubmit(formData);
     setFormData({ topicName: '', topicRules: '', topicInstructions: '' });
   };
 

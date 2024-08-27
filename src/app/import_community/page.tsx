@@ -21,6 +21,7 @@ export default function ImportCommunityPage() {
   const [communityRules, setCommunityRules] = useState('');
   const [communityInstructions, setCommunityInstructions] = useState('');
   const [isValidating, setIsValidating] = useState(false);
+  const [nextId, setNextId] = useState(1000); // Start from 1000 to avoid conflicts with existing IDs
   const router = useRouter();
 
   const handleGroupLinkSubmit = async (e: React.FormEvent) => {
@@ -72,7 +73,13 @@ export default function ImportCommunityPage() {
   };
   
   const handleTopicSubmit = (data: Topic) => {
-    setTopics([...topics, data]);
+    const newTopic = {
+      ...data,
+      id: nextId,
+      status: 'New'
+    };
+    setTopics([...topics, newTopic]);
+    setNextId(nextId + 1);
   };
 
   const handleTopicRemove = (index: number) => {
@@ -96,15 +103,14 @@ export default function ImportCommunityPage() {
       topics: topics.map(topic => ({
         Name: topic.topicName,
         Status: topic.status || 'New',
-        ID: topic.id,
+        ID: topic.id || undefined, // Use undefined for new topics without an ID
         Rules: topic.topicRules,
         Instructions: topic.topicInstructions,
       })),
     };
 
-    console.log(requestData);
+    console.log("Request Data:", requestData);
     try {
-      console.log("Request Data:", requestData);
       const response = await fetch('http://10.70.18.32:5000/import_channel', {
         method: 'POST',
         headers: {
