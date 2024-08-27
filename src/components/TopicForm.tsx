@@ -8,39 +8,41 @@ interface Topic {
   topicRules: string;
 }
 
-export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => void, topics: Topic[] }) => {
+interface TopicFormProps {
+  onSubmit: (data: Topic) => void;
+  topics: Topic[];
+  onRemove: (index: number) => void;
+}
+
+export const TopicForm = ({ onSubmit, topics, onRemove }: TopicFormProps) => {
   const [formData, setFormData] = useState<Topic>({
     topicName: '',
     topicDescription: '',
     topicRules: '',
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(formData);
-    setFormData({
-      topicName: '',
-      topicDescription: '',
-      topicRules: '',
-    });
+    setFormData({ topicName: '', topicDescription: '', topicRules: '' });
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <motion.form
         onSubmit={handleSubmit}
-        className="space-y-6"
+        className="space-y-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="topicName" className="block text-lg font-semibold text-indigo-300 mb-2">
+            <label htmlFor="topicName" className="block text-sm font-semibold text-indigo-300 mb-1">
               <FaHashtag className="inline-block mr-2" />
               Topic Name
             </label>
@@ -51,12 +53,12 @@ export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => voi
               value={formData.topicName}
               onChange={handleChange}
               required
-              className="w-full rounded-md bg-gray-800 border-2 border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-500 p-4 text-lg transition-all duration-300"
+              className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
               placeholder="Enter topic name"
             />
           </div>
           <div>
-            <label htmlFor="topicDescription" className="block text-lg font-semibold text-indigo-300 mb-2">
+            <label htmlFor="topicDescription" className="block text-sm font-semibold text-indigo-300 mb-1">
               <FaInfoCircle className="inline-block mr-2" />
               Description
             </label>
@@ -67,12 +69,12 @@ export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => voi
               value={formData.topicDescription}
               onChange={handleChange}
               required
-              className="w-full rounded-md bg-gray-800 border-2 border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-500 p-4 text-lg transition-all duration-300"
+              className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
               placeholder="Brief description"
             />
           </div>
           <div>
-            <label htmlFor="topicRules" className="block text-lg font-semibold text-indigo-300 mb-2">
+            <label htmlFor="topicRules" className="block text-sm font-semibold text-indigo-300 mb-1">
               <FaList className="inline-block mr-2" />
               Rules
             </label>
@@ -83,7 +85,7 @@ export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => voi
               value={formData.topicRules}
               onChange={handleChange}
               required
-              className="w-full rounded-md bg-gray-800 border-2 border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-500 p-4 text-lg transition-all duration-300"
+              className="w-full rounded-md bg-gray-800 border border-indigo-500 text-white shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 p-2 text-sm transition-all duration-300"
               placeholder="Topic rules"
             />
           </div>
@@ -94,7 +96,7 @@ export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => voi
         >
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-4 px-6 rounded-lg hover:opacity-90 transition-all duration-300 text-xl font-bold shadow-lg flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300 text-sm font-bold shadow-lg flex items-center justify-center"
           >
             <FaPlus className="mr-2" />
             Add Topic
@@ -103,16 +105,16 @@ export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => voi
       </motion.form>
 
       {topics.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-2xl font-bold text-indigo-300 mb-4">Added Topics</h3>
-          <div className="bg-gray-800 rounded-lg overflow-hidden">
-            <table className="w-full">
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold text-indigo-300 mb-2">Added Topics</h3>
+          <div className="bg-gray-900 rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-700">
-                  <th className="px-4 py-2 text-left text-indigo-300">Topic Name</th>
-                  <th className="px-4 py-2 text-left text-indigo-300">Description</th>
-                  <th className="px-4 py-2 text-left text-indigo-300">Rules</th>
-                  <th className="px-4 py-2 text-left text-indigo-300">Actions</th>
+                <tr className="bg-gray-800">
+                  <th className="px-2 py-1 text-left text-indigo-300">Topic Name</th>
+                  <th className="px-2 py-1 text-left text-indigo-300">Description</th>
+                  <th className="px-2 py-1 text-left text-indigo-300">Rules</th>
+                  <th className="px-2 py-1 text-left text-indigo-300">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -126,11 +128,14 @@ export const TopicForm = ({ onSubmit, topics }: { onSubmit: (data: Topic) => voi
                       transition={{ duration: 0.3 }}
                       className="border-b border-gray-700"
                     >
-                      <td className="px-4 py-2 text-white">{topic.topicName}</td>
-                      <td className="px-4 py-2 text-white">{topic.topicDescription}</td>
-                      <td className="px-4 py-2 text-white">{topic.topicRules}</td>
-                      <td className="px-4 py-2">
-                        <button className="text-red-500 hover:text-red-600 transition-colors duration-300">
+                      <td className="px-2 py-1 text-white">{topic.topicName}</td>
+                      <td className="px-2 py-1 text-white">{topic.topicDescription}</td>
+                      <td className="px-2 py-1 text-white">{topic.topicRules}</td>
+                      <td className="px-2 py-1">
+                        <button
+                          onClick={() => onRemove(index)}
+                          className="text-red-500 hover:text-red-600 transition-colors duration-300"
+                        >
                           <FaTimes />
                         </button>
                       </td>

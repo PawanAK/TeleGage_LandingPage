@@ -21,6 +21,10 @@ export default function CreateCommunityPage() {
     setTopics([...topics, data]);
   };
 
+  const handleTopicRemove = (index: number) => {
+    setTopics(topics.filter((_, i) => i !== index));
+  };
+
   const handleFinish = async () => {
     console.log('Community Data:', communityData);
     console.log('Topics:', topics);
@@ -31,17 +35,17 @@ export default function CreateCommunityPage() {
 
   return (
     <div className="bg-black text-white min-h-screen bg-[linear-gradient(to_bottom,#000,#200D42_34%,#4F21A1_65%,#A45EDB_82%)]">
-      <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <div className="container mx-auto px-4 py-6 max-w-2xl">
         <motion.div
           initial={{ width: "0%" }}
           animate={{ width: `${progressPercentage}%` }}
-          className="h-2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full mb-8"
+          className="h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full mb-4"
         />
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text"
+          className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text"
         >
           {step === 1 ? 'Create Your Community' : 'Add Topics'}
         </motion.h1>
@@ -52,19 +56,19 @@ export default function CreateCommunityPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-gray-800 p-8 rounded-lg shadow-lg"
+            className="bg-gray-800 p-4 rounded-lg shadow-lg"
           >
             {step === 1 ? (
               <CommunityForm onSubmit={handleCommunitySubmit} />
             ) : (
               <>
-                <TopicForm onSubmit={handleTopicSubmit} topics={topics} />
-                <div className="mt-8 flex justify-between">
+                <TopicForm onSubmit={handleTopicSubmit} topics={topics} onRemove={handleTopicRemove} />
+                <div className="mt-4 flex justify-between">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setStep(1)}
-                    className="flex items-center bg-gray-600 text-white py-2 px-6 rounded-lg hover:bg-gray-700 transition duration-300"
+                    className="flex items-center bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-300 text-sm"
                   >
                     <FaArrowLeft className="mr-2" />
                     Back
@@ -73,7 +77,7 @@ export default function CreateCommunityPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleFinish}
-                    className="flex items-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-6 rounded-lg hover:opacity-90 transition duration-300"
+                    className="flex items-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition duration-300 text-sm"
                   >
                     Finish
                     <FaCheck className="ml-2" />
