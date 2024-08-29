@@ -17,7 +17,7 @@ export default function ImportCommunityPage() {
   const [step, setStep] = useState(1);
   const [groupLink, setGroupLink] = useState('');
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(true); // Set this to true initially
   const [communityRules, setCommunityRules] = useState('');
   const [communityInstructions, setCommunityInstructions] = useState('');
   const [isValidating, setIsValidating] = useState(false);
