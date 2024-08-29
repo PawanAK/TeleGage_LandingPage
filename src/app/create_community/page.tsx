@@ -47,7 +47,7 @@ export default function CreateCommunityPage() {
 
     console.log(requestData);
     try {
-      const response = await fetch('http://telegage.centralindia.cloudapp.azure.com/create_telegram_channel', {
+      const response = await fetch('https://tegegageapplication.onrender.com//create_telegram_channel', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

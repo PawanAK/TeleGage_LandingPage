@@ -42,7 +42,7 @@ export default function ImportCommunityPage() {
     console.log(channelId);
   
     try {
-      const response = await fetch('http://telegage.centralindia.cloudapp.azure.com/get_topics_by_community', {
+      const response = await fetch('https://tegegageapplication.onrender.com//get_topics_by_community', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ telegram_channel_username: channelId }),
@@ -111,7 +111,7 @@ export default function ImportCommunityPage() {
 
     console.log("Request Data:", requestData);
     try {
-      const response = await fetch('http://telegage.centralindia.cloudapp.azure.com/import_channel', {
+      const response = await fetch('https://tegegageapplication.onrender.com//import_channel', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
