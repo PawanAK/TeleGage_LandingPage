@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CommunityForm } from '@/components/CommunityForm';
 import { TopicForm } from '@/components/TopicForm';
@@ -18,6 +18,7 @@ export default function CreateCommunityPage() {
   };
 
   const handleTopicSubmit = (data: any) => {
+    console.log(data);
     setTopics([...topics, data]);
   };
 
@@ -47,7 +48,7 @@ export default function CreateCommunityPage() {
 
     console.log(requestData);
     try {
-      const response = await fetch('https://tegegageapplication.onrender.com//create_telegram_channel', {
+      const response = await fetch('https://tegegageapplication.onrender.com/create_telegram_channel', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,6 +68,10 @@ export default function CreateCommunityPage() {
       // Handle error (e.g., show error message to user)
     }
   };
+
+  useEffect(() => {
+    console.log('Topics updated:', topics);
+  }, [topics]);
 
   const progressPercentage = step === 1 ? 50 : 100;
 
