@@ -5,6 +5,11 @@ import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
 
+interface Community {
+  id: number;
+  name: string;
+}
+
 const DashboardSummary = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -52,7 +57,7 @@ const CommunityStats = () => {
 
 export default function DashboardPage() {
   const [username, setUsername] = useState('');
-  const [communities, setCommunities] = useState([]);
+  const [communities, setCommunities] = useState<Community[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -135,7 +140,7 @@ export default function DashboardPage() {
               </motion.div>
             ))
           ) : (
-            <p className="text-center text-xl">You haven't created or imported any communities yet.</p>
+            <p className="text-center text-xl">You haven&apos;t created or imported any communities yet.</p>
           )}
         </motion.div>
       </main>

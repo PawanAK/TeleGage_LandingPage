@@ -25,6 +25,12 @@ export default function CreateCommunityPage() {
     setTopics(topics.filter((_, i) => i !== index));
   };
 
+  const handleTopicEdit = (index: number, updatedTopic: any) => {
+    const newTopics = [...topics];
+    newTopics[index] = updatedTopic;
+    setTopics(newTopics);
+  };
+
   const handleFinish = async () => {
     const requestData = {
       telegram_channel_title: communityData.communityName,
@@ -93,7 +99,12 @@ export default function CreateCommunityPage() {
               <CommunityForm onSubmit={handleCommunitySubmit} />
             ) : (
               <>
-                <TopicForm onSubmit={handleTopicSubmit} topics={topics} onRemove={handleTopicRemove} />
+                <TopicForm 
+                  onSubmit={handleTopicSubmit} 
+                  topics={topics} 
+                  onRemove={handleTopicRemove} 
+                  onEdit={handleTopicEdit}
+                />
                 <div className="mt-4 flex justify-between">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
