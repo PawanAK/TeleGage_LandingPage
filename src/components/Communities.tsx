@@ -15,7 +15,7 @@ export const Communities = () => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/communities');
+        const response = await axios.get('https://telegage-server.onrender.com/api/communities');
         setCommunities(response.data);
       } catch (error) {
         console.error('Failed to fetch communities:', error);

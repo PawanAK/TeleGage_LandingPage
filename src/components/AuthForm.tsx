@@ -46,7 +46,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
           localStorage.setItem('petraAddress', response.address);
           
           if (isLogin) {
-            const loginResponse = await axios.post('http://localhost:3001/api/login', { walletAddress: response.address });
+            const loginResponse = await axios.post('https://telegage-server.onrender.com/api/login', { walletAddress: response.address });
             console.log("Login with wallet successful", loginResponse.data);
             setSuccessMessage(loginResponse.data.message);
             setErrorMessage("");
@@ -73,14 +73,14 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
       try {
         if (isLogin) {
           if (loginMethod === "wallet") {
-            const response = await axios.post('http://localhost:3001/api/login', { walletAddress: petraAddress });
+            const response = await axios.post('https://telegage-server.onrender.com/api/login', { walletAddress: petraAddress });
             console.log("Login with wallet successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
             localStorage.setItem('user', JSON.stringify({ username, walletAddress: petraAddress }));
             router.push('/dashboard');
           } else {
-            const response = await axios.post('http://localhost:3001/api/login', { username, password });
+            const response = await axios.post('https://telegage-server.onrender.com/api/login', { username, password });
             console.log("Login with credentials successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
@@ -89,7 +89,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
           }
         } else {
           if (petraAddress && username && password) {
-            const response = await axios.post('http://localhost:3001/api/signup', { username, password, walletAddress: petraAddress });
+            const response = await axios.post('https://telegage-server.onrender.com/api/signup', { username, password, walletAddress: petraAddress });
             console.log("Sign Up successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
