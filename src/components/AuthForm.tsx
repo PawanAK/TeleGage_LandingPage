@@ -45,15 +45,13 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
           setWalletAddress(response.address);
           console.log("Petra wallet connected, address:", response.address);
           setPetraAddress(response.address);
-          // Save the wallet address in local storage
-          localStorage.setItem('petraAddress', response.address);
           
           if (isLogin) {
             const loginResponse = await axios.post('https://telegage-server.onrender.com/api/login', { walletAddress: response.address });
             console.log("Login with wallet successful", loginResponse.data);
             setSuccessMessage(loginResponse.data.message);
             setErrorMessage("");
-            localStorage.setItem('user', JSON.stringify({ walletAddress: response.address }));
+            localStorage.setItem('user', JSON.stringify({ walletAddress: response.address, has_community: loginResponse.data.has_community }));
             router.push('/dashboard');
           }
         } catch (error) {
@@ -68,8 +66,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     const disconnectPetra = async () => {
         await wallet.disconnect();
         setPetraAddress('');
-        // Remove the wallet address from local storage when disconnecting
-        localStorage.removeItem('petraAddress');
+        localStorage.removeItem('user');
     };
   
     const handleSubmit = async (e: React.FormEvent) => {
@@ -81,14 +78,14 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
             console.log("Login with wallet successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
-            localStorage.setItem('user', JSON.stringify({ username, walletAddress: petraAddress }));
+            localStorage.setItem('user', JSON.stringify({ walletAddress: petraAddress, has_community: response.data.has_community }));
             router.push('/dashboard');
           } else {
             const response = await axios.post('https://telegage-server.onrender.com/api/login', { username, password });
             console.log("Login with credentials successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
-            localStorage.setItem('user', JSON.stringify({ username, walletAddress: petraAddress }));
+            localStorage.setItem('user', JSON.stringify({ username, has_community: response.data.has_community }));
             router.push('/dashboard');
           }
         } else {
@@ -97,7 +94,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
             console.log("Sign Up successful", response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage("");
-            localStorage.setItem('user', JSON.stringify({ username, walletAddress: petraAddress }));
+            // Don't store user info after signup, only after login
           } else {
             setErrorMessage("Please fill all fields and connect wallet for signup");
           }
@@ -114,12 +111,11 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
       }
     };
 
+
+
     useEffect(() => {
       // Retrieve the stored wallet address from local storage when the component mounts
-      const storedAddress = localStorage.getItem('petraAddress');
-      if (storedAddress) {
-        setPetraAddress(storedAddress);
-      }
+      
     }, []);
 
     return (
