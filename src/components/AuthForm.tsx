@@ -18,6 +18,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     const [petraAddress, setPetraAddress] = useState('');
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [walletAddress, setWalletAddress] = useState("");
     
     const router = useRouter();
 
@@ -41,8 +42,10 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
       if (isClient && window.aptos) {
         try {
           const response = await wallet.connect();
+          setWalletAddress(response.address);
           console.log("Petra wallet connected, address:", response.address);
           setPetraAddress(response.address);
+          // Save the wallet address in local storage
           localStorage.setItem('petraAddress', response.address);
           
           if (isLogin) {
@@ -65,6 +68,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     const disconnectPetra = async () => {
         await wallet.disconnect();
         setPetraAddress('');
+        // Remove the wallet address from local storage when disconnecting
         localStorage.removeItem('petraAddress');
     };
   
@@ -111,6 +115,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     };
 
     useEffect(() => {
+      // Retrieve the stored wallet address from local storage when the component mounts
       const storedAddress = localStorage.getItem('petraAddress');
       if (storedAddress) {
         setPetraAddress(storedAddress);

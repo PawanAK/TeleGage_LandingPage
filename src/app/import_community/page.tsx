@@ -99,6 +99,7 @@ export default function ImportCommunityPage() {
     const requestData = {
       telegram_channel_username: channelId,
       telegram_channel_rules: communityRules,
+      telegram_channel_owner: localStorage.getItem('petraAddress'),
       telegram_channel_instructions: communityInstructions,
       topics: topics.map(topic => ({
         Name: topic.topicName,
@@ -121,6 +122,20 @@ export default function ImportCommunityPage() {
 
       if (response.ok) {
         console.log('Telegram channel updated successfully');
+
+        // Update the user's has_community field
+        try {
+          await fetch('https://telegage-server.onrender.com/update_user_community_status', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ walletAddress: localStorage.getItem('petraAddress'), has_community: true }),
+          });
+        } catch (error) {
+          console.error('Error updating user community status:', error);
+        }
+
         router.push('/dashboard');
       } else {
         console.error('Failed to update Telegram channel');

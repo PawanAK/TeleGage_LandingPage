@@ -39,6 +39,7 @@ export default function CreateCommunityPage() {
       telegram_admin_id: communityData.telegramUsername,
       telegram_channel_rules: communityData.communityRules,
       telegram_channel_instructions: communityData.communityInstructions,
+      telegram_channel_owner: localStorage.getItem('petraAddress'),
       topics: topics.map(topic => ({
         Name: topic.topicName,
         Rules: topic.topicRules,
@@ -58,6 +59,20 @@ export default function CreateCommunityPage() {
 
       if (response.ok) {
         console.log('Telegram channel created successfully');
+        
+        // Update the user's has_community field
+        try {
+          await fetch('https://telegage-server.onrender.com/update_user_community_status', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ walletAddress: localStorage.getItem('petraAddress'), has_community: true }),
+          });
+        } catch (error) {
+          console.error('Error updating user community status:', error);
+        }
+
         router.push('/dashboard');
       } else {
         console.error('Failed to create Telegram channel');
