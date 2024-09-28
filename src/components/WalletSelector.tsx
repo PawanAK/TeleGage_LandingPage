@@ -71,9 +71,15 @@ export function WalletSelector(walletSortingOptions: WalletSortingOptions) {
   return connected ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button>
-          {account?.ansName || truncateAddress(account?.address) || "Unknown"}
-        </Button>
+      <div className="space-y-4">
+            <button 
+              type="button"
+              className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-all duration-300 flex items-center justify-center"
+            >
+              
+              {account?.ansName || truncateAddress(account?.address) || "Unknown"}
+            </button>
+          </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onSelect={copyAddress} className="gap-2">
@@ -99,7 +105,14 @@ export function WalletSelector(walletSortingOptions: WalletSortingOptions) {
   ) : (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button>Connect a Wallet</Button>
+      <div className="space-y-4">
+            <button 
+              type="button"
+              className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-all duration-300 flex items-center justify-center"
+            >
+              Connect Wallet
+            </button>
+          </div>
       </DialogTrigger>
       <ConnectWalletDialog close={closeDialog} {...walletSortingOptions} />
     </Dialog>

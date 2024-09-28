@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { FaUser, FaLock, FaWallet } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { WalletSelector as ShadcnWalletSelector } from "./WalletSelector"
+import { WalletSelector } from "./WalletSelector"
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 
 export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
@@ -145,7 +145,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
                             transition={{ duration: 0.3 }}
                             className="space-y-4"
                         >
-                            <ShadcnWalletSelector />
+                            <WalletSelector />
                             {connected && (
                                 <motion.button 
                                     type="button" 
