@@ -7,6 +7,7 @@ interface Community {
   description: string;
   memberCount: number;
   messageCount: number;
+  title: string;
 }
 
 

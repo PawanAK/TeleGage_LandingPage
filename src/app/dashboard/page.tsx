@@ -1,20 +1,25 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart } from 'lucide-react';
+import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy } from 'lucide-react';
+
+// ... existing imports ...
 
 interface Community {
-  likes: ReactNode;
   _id: string;
   community_id: string;
   community_name: string;
   community_description: string;
   users: any[];
+  title: string;  // Add this line
+  memberCount: number;  // Add this line if it's used in the Communities component
 }
+
+// ... 
 
 interface Stats {
   number_of_messages: number;
@@ -146,27 +151,16 @@ const RecentActivity = () => (
 
 export default function DashboardPage() {
   const [username, setUsername] = useState('');
+  const [walletAddress, setWalletAddress] = useState('');
   const [communities, setCommunities] = useState<Community[]>([]);
   const [hasCommunity, setHasCommunity] = useState(false);
   const [communityStats, setCommunityStats] = useState<Stats | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (!user) {
-      router.push('/auth');
-    } else {
-      const { username, has_community } = JSON.parse(user);
-      setUsername(username);
-      setHasCommunity(has_community);
-      fetchCommunities();
-    }
-  }, [router]);
-
-  const fetchCommunities = async () => {
+  const fetchCommunities = useCallback(async () => {
     try {
       const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
-      const response = await fetch('http://localhost:3001/api/communities', {
+      const response = await fetch('https://telegage-server.onrender.com/api/communities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress }),
@@ -189,12 +183,12 @@ export default function DashboardPage() {
       setCommunities([]);
       setHasCommunity(false);
     }
-  };
+  }, []);
 
   const fetchCommunityStats = async (communityId: number) => {
     try {
       const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
-      const response = await fetch('http://localhost:3001/api/community-stats', {
+      const response = await fetch('https://telegage-server.onrender.com/api/community-stats', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress, communityId }),
@@ -206,6 +200,19 @@ export default function DashboardPage() {
     }
   };
 
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      router.push('/auth');
+    } else {
+      const { username, has_community, walletAddress } = JSON.parse(user);
+      setUsername(username);
+      setWalletAddress(walletAddress);
+      setHasCommunity(has_community);
+      fetchCommunities();
+    }
+  }, [router, walletAddress, fetchCommunities]);
+
   return (
     <div className="bg-black text-white min-h-screen bg-[linear-gradient(to_bottom,#000,#200D42_34%,#4F21A1_65%,#A45EDB_82%)]">
       <header className="bg-gray-900 p-4 shadow-md">
@@ -215,10 +222,17 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-bold ml-2">TeleGage Dashboard</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <Bell size={24} className="text-gray-300 hover:text-white cursor-pointer" />
-            <div className="flex items-center">
-              <Image src="/placeholder.svg?height=32&width=32" alt="User Avatar" width={32} height={32} className="rounded-full mr-2" />
-              <span>Welcome, {username}</span>
+           
+            <div className="flex items-center bg-gray-800 rounded-full px-3 py-2 hover:bg-gray-700 transition-colors duration-300">
+              <Wallet size={18} className="mr-2 text-gray-300" />
+              <span className="text-sm font-medium truncate max-w-[150px] text-gray-200">{walletAddress}</span>
+              <button 
+                onClick={() => navigator.clipboard.writeText(walletAddress)}
+                className="ml-2 text-gray-400 hover:text-gray-200 focus:outline-none"
+                title="Copy wallet address"
+              >
+                <Copy size={14} />
+              </button>
             </div>
             <button 
               onClick={() => {
@@ -280,7 +294,7 @@ export default function DashboardPage() {
               <p className="text-center text-xl">Loading communities...</p>
             )
           ) : (
-            <p className="text-center text-xl">You haven't created or imported any communities yet.</p>
+            <p className="text-center text-xl">You haven&apos;t created or imported any communities yet.</p>
           )}
         </motion.div>
       </main>
