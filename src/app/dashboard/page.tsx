@@ -8,26 +8,19 @@ import { motion } from 'framer-motion';
 interface Community {
   id: number;
   name: string;
+  description: string;
+  memberCount: number;
+  messageCount: number;
 }
 
-const DashboardSummary = () => {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h3 className="text-xl font-semibold mb-2 text-white/70">Total Members</h3>
-        <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">5,000</p>
-      </div>
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h3 className="text-xl font-semibold mb-2 text-white/70">Active Users</h3>
-        <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">1,200</p>
-      </div>
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h3 className="text-xl font-semibold mb-2 text-white/70">Total Messages</h3>
-        <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">150,000</p>
-      </div>
-    </div>
-  );
-};
+interface Stats {
+  number_of_messages: number;
+  number_of_nfts_minted: number;
+  points_earned: number;
+  community_id: number;
+}
+  
+
 
 const CommunityStats = ({ stats }) => {
   return (
@@ -55,6 +48,34 @@ const CommunityStats = ({ stats }) => {
   );
 };
 
+const CommunityInfo = ({ community }) => {
+  return (
+    <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+      <h2 className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
+        {community.community_name}
+      </h2>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">Community ID</h3>
+          <p className="text-xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
+            {community.community_id}
+          </p>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">Total Members</h3>
+          <p className="text-xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
+            {community.users.length}
+          </p>
+        </div>
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold mb-2 text-white/70">Community Description</h3>
+        <p className="text-white/70">{community.community_description}</p>
+      </div>
+    </div>
+  );
+};
+
 export default function DashboardPage() {
   const [username, setUsername] = useState('');
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -75,40 +96,58 @@ export default function DashboardPage() {
       setHasCommunity(has_community);
 
       // Fetch user's communities and stats
-      fetchCommunityStats();
+      fetchCommunities();
     }
   }, [router]);
 
   const fetchCommunities = async () => {
     try {
-      const walletAddress = localStorage.getItem('petraAddress');
-      const response = await fetch(`https://telegage-server.onrender.com/api/communities?walletAddress=${walletAddress}`);
+      const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await fetch('http://localhost:3001/api/communities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ walletAddress}),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setCommunities(data);
-
-      if (data.length > 0) {
-        const communityId = data[0].community_id;
-        fetchCommunityStats();
+      console.log("Response of communities:", data);
+      
+      // Ensure data is an array before setting state
+      if (Array.isArray(data)) {
+        setCommunities(data);
+        setHasCommunity(data.length > 0);
+        if (data.length > 0) {
+          fetchCommunityStats(data[0].id);
+        }
+      } else {
+        console.error('Fetched communities data is not an array:', data);
+        setCommunities([]);
+        setHasCommunity(false);
       }
     } catch (error) {
       console.error('Error fetching communities:', error);
+      setCommunities([]);
+      setHasCommunity(false);
     }
   };
 
-  const fetchCommunityStats = async () => {
+  const fetchCommunityStats = async (communityId: number) => {
     try {
       const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
-      console.log("walletAddress", walletAddress);
       const response = await fetch('http://localhost:3001/api/community-stats', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ walletAddress }),
+        body: JSON.stringify({ walletAddress, communityId }),
       });
       const data = await response.json();
-      console.log("data", data);
-      setCommunityStats(data.Stats); // Update this line
+      setCommunityStats(data.Stats);
     } catch (error) {
       console.error('Error fetching community stats:', error);
     }
@@ -165,27 +204,26 @@ export default function DashboardPage() {
               </motion.button>
             </div>
           )}
+          
           {hasCommunity ? (
-            communities.map((community) => (
-              <motion.div
-                key={community.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mb-8"
-              >
-                <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
-                  {community.name}
-                </h2>
-                <DashboardSummary />
-                <CommunityStats />
-              </motion.div>
-            ))
+            communities.length > 0 ? (
+              communities.map((community) => (
+                <motion.div
+                  key={community._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="mb-8"
+                >
+                  <CommunityInfo community={community} />
+                  {communityStats && <CommunityStats stats={communityStats} />}
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-center text-xl">Loading communities...</p>
+            )
           ) : (
             <p className="text-center text-xl">You haven&apos;t created or imported any communities yet.</p>
-          )}
-          {communityStats && (
-            <CommunityStats stats={communityStats} />
           )}
         </motion.div>
       </main>

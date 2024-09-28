@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface Community {
-  id: string;
-  title: string;
+  id: number;
+  name: string;
+  description: string;
   memberCount: number;
   messageCount: number;
-  moderationActions: number;  // This field is now correctly inside the interface
 }
+
 
 export const Communities = () => {
   const [communities, setCommunities] = useState<Community[]>([]);
