@@ -29,26 +29,26 @@ const DashboardSummary = () => {
   );
 };
 
-const CommunityStats = () => {
+const CommunityStats = ({ stats }) => {
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-white">Community Statistics</h2>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-white/70">Top Contributors</h3>
-          <ul className="space-y-2">
-            <li className="text-white">@user1 - 500 Points</li>
-            <li className="text-white">@user2 - 450 Points</li>
-            <li className="text-white">@user3 - 400 Points</li>
-          </ul>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">Number of Messages</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.number_of_messages}</p>
         </div>
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-white/70">Recent Moderation Actions</h3>
-          <ul className="space-y-2">
-            <li className="text-white">Removed spam message</li>
-            <li className="text-white">Muted @spammer for 24 hours</li>
-            <li className="text-white">Deleted off-topic thread</li>
-          </ul>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">NFTs Minted</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.number_of_nfts_minted}</p>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">Points Earned</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.points_earned}</p>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">Community ID</h3>
+          <p className="text-xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.community_id}</p>
         </div>
       </div>
     </div>
@@ -59,6 +59,7 @@ export default function DashboardPage() {
   const [username, setUsername] = useState('');
   const [communities, setCommunities] = useState<Community[]>([]);
   const [hasCommunity, setHasCommunity] = useState(false);
+  const [communityStats, setCommunityStats] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -72,13 +73,46 @@ export default function DashboardPage() {
       console.log("Has community:", has_community);
       setUsername(username);
       setHasCommunity(has_community);
-      // Fetch user's communities (mock data for now)
-      setCommunities([
-        { id: 1, name: 'Crypto Enthusiasts' },
-        { id: 2, name: 'NFT Collectors' },
-      ]);
+
+      // Fetch user's communities and stats
+      fetchCommunityStats();
     }
   }, [router]);
+
+  const fetchCommunities = async () => {
+    try {
+      const walletAddress = localStorage.getItem('petraAddress');
+      const response = await fetch(`https://telegage-server.onrender.com/api/communities?walletAddress=${walletAddress}`);
+      const data = await response.json();
+      setCommunities(data);
+
+      if (data.length > 0) {
+        const communityId = data[0].community_id;
+        fetchCommunityStats();
+      }
+    } catch (error) {
+      console.error('Error fetching communities:', error);
+    }
+  };
+
+  const fetchCommunityStats = async () => {
+    try {
+      const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
+      console.log("walletAddress", walletAddress);
+      const response = await fetch('http://localhost:3001/api/community-stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ walletAddress }),
+      });
+      const data = await response.json();
+      console.log("data", data);
+      setCommunityStats(data.Stats); // Update this line
+    } catch (error) {
+      console.error('Error fetching community stats:', error);
+    }
+  };
 
   return (
     <div className="bg-black text-white min-h-screen bg-[linear-gradient(to_bottom,#000,#200D42_34%,#4F21A1_65%,#A45EDB_82%)]">
@@ -149,6 +183,9 @@ export default function DashboardPage() {
             ))
           ) : (
             <p className="text-center text-xl">You haven&apos;t created or imported any communities yet.</p>
+          )}
+          {communityStats && (
+            <CommunityStats stats={communityStats} />
           )}
         </motion.div>
       </main>
