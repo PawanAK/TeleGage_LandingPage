@@ -4,6 +4,8 @@ import clsx from "clsx";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { WalletProvider } from "@/components/WalletProvider";
 
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
@@ -20,7 +22,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={clsx(dmSans.className, "antialiased")}>
+      <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+    <WalletProvider>
         {children}
+        </WalletProvider>
+        </ThemeProvider>
+        
         <SpeedInsights />
         <Analytics />
       </body>
