@@ -4,8 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Bell, Wallet } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface Community {
   _id: string;
@@ -19,8 +18,6 @@ interface Stats {
   number_of_messages: number;
   number_of_nfts_minted: number;
   points_earned: number;
-  active_users: number;
-  total_transactions: number;
 }
 
 const mockChartData = [
@@ -32,59 +29,22 @@ const mockChartData = [
   { name: 'Jun', messages: 239, points: 380, nfts: 22 },
 ];
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
-
 const CommunityStats = ({ stats }: { stats: Stats }) => {
-  const pieData = [
-    { name: 'Messages', value: stats.number_of_messages },
-    { name: 'NFTs', value: stats.number_of_nfts_minted },
-    { name: 'Points', value: stats.points_earned },
-    { name: 'Users', value: stats.active_users },
-  ];
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-white">Community Overview</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-white/70">Messages</h3>
-            <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.number_of_messages}</p>
-          </div>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-white/70">NFTs Minted</h3>
-            <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.number_of_nfts_minted}</p>
-          </div>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-white/70">Points Earned</h3>
-            <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.points_earned}</p>
-          </div>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-white/70">Active Users</h3>
-            <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.active_users}</p>
-          </div>
+    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-white">Community Statistics</h2>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">Number of Messages</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.number_of_messages}</p>
+
+          <h3 className="text-lg font-semibold mb-2 text-white/70 mt-4">NFTs Minted</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.number_of_nfts_minted}</p>
         </div>
-      </div>
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-white">Activity Distribution</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={pieData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-white/70">Points Earned</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">{stats.points_earned}</p>
+        </div>
       </div>
     </div>
   );
@@ -96,21 +56,21 @@ const CommunityInfo = ({ community }: { community: Community }) => {
       <h2 className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
         {community.community_name}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="bg-gray-700 p-4 rounded-lg">
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
           <h3 className="text-lg font-semibold mb-2 text-white/70">Community ID</h3>
           <p className="text-xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
             {community.community_id}
           </p>
         </div>
-        <div className="bg-gray-700 p-4 rounded-lg">
+        <div>
           <h3 className="text-lg font-semibold mb-2 text-white/70">Total Members</h3>
           <p className="text-xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
             {community.users.length}
           </p>
         </div>
       </div>
-      <div className="bg-gray-700 p-4 rounded-lg">
+      <div>
         <h3 className="text-lg font-semibold mb-2 text-white/70">Community Description</h3>
         <p className="text-white/70">{community.community_description}</p>
       </div>
@@ -142,7 +102,7 @@ const RecentActivity = () => {
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
       <h2 className="text-2xl font-bold mb-4 text-white">Recent Activity</h2>
       <ul className="space-y-4">
-        <li className="flex items-center bg-gray-700 p-3 rounded-lg">
+        <li className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center mr-4">
             <span className="text-white font-bold">JD</span>
           </div>
@@ -151,7 +111,7 @@ const RecentActivity = () => {
             <p className="text-sm text-white/70">2 hours ago</p>
           </div>
         </li>
-        <li className="flex items-center bg-gray-700 p-3 rounded-lg">
+        <li className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center mr-4">
             <span className="text-white font-bold">AS</span>
           </div>
@@ -160,7 +120,7 @@ const RecentActivity = () => {
             <p className="text-sm text-white/70">5 hours ago</p>
           </div>
         </li>
-        <li className="flex items-center bg-gray-700 p-3 rounded-lg">
+        <li className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center mr-4">
             <span className="text-white font-bold">BJ</span>
           </div>
@@ -176,7 +136,6 @@ const RecentActivity = () => {
 
 export default function DashboardPage() {
   const [username, setUsername] = useState('');
-  const [walletAddress, setWalletAddress] = useState('');
   const [communities, setCommunities] = useState<Community[]>([]);
   const [hasCommunity, setHasCommunity] = useState(false);
   const [communityStats, setCommunityStats] = useState<Stats | null>(null);
@@ -187,9 +146,8 @@ export default function DashboardPage() {
     if (!user) {
       router.push('/auth');
     } else {
-      const { username, has_community, walletAddress } = JSON.parse(user);
+      const { username, has_community } = JSON.parse(user);
       setUsername(username);
-      setWalletAddress(walletAddress);
       setHasCommunity(has_community);
       fetchCommunities();
     }
@@ -241,11 +199,7 @@ export default function DashboardPage() {
         body: JSON.stringify({ walletAddress, communityId }),
       });
       const data = await response.json();
-      setCommunityStats({
-        ...data.Stats,
-        active_users: Math.floor(Math.random() * 1000) + 100, // Mocked data
-        total_transactions: Math.floor(Math.random() * 10000) + 1000, // Mocked data
-      });
+      setCommunityStats(data.Stats);
     } catch (error) {
       console.error('Error fetching community stats:', error);
     }
@@ -253,43 +207,37 @@ export default function DashboardPage() {
 
   return (
     <div className="bg-black text-white min-h-screen bg-[linear-gradient(to_bottom,#000,#200D42_34%,#4F21A1_65%,#A45EDB_82%)]">
-      <header className="bg-gray-900 p-4 shadow-md fixed w-full z-10">
+      <header className="bg-gray-900 p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
             <Image src={logoImg} alt="TeleGage Logo" width={40} height={40} />
             <h1 className="text-2xl font-bold ml-2">TeleGage Dashboard</h1>
           </div>
-          <div className="flex items-center">
-            <button className="mr-4">
-              <Bell size={24} />
-            </button>
-            <div className="flex items-center bg-gray-800 rounded-full px-4 py-2">
-              <Wallet size={20} className="mr-2" />
-              <span className="text-sm font-medium truncate max-w-[150px]">{walletAddress}</span>
-            </div>
+          <div>
+            <span className="mr-4">Welcome, {username}</span>
             <button 
               onClick={() => {
                 localStorage.removeItem('user');
                 router.push('/auth');
               }}
-              className="ml-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition duration-300"
+              className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition duration-300"
             >
               Logout
             </button>
           </div>
         </div>
       </header>
-      <main className="container mx-auto pt-24 px-4">
+      <main className="container mx-auto mt-8 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text">
-            Welcome to Your Dashboard, {username}
+            Welcome to Your Dashboard
           </h2>
           {!hasCommunity && (
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <div className="flex justify-center space-x-4 mb-8">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
