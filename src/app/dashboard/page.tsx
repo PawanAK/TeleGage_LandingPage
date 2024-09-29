@@ -5,9 +5,8 @@ import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy } from 'lucide-react';
-
-// ... existing imports ...
+import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare } from 'lucide-react';
+import { NFTPackForm } from '@/components/NFTPackForm';
 
 interface Community {
   _id: string;
@@ -18,8 +17,6 @@ interface Community {
   title: string;  // Add this line
   memberCount: number;  // Add this line if it's used in the Communities component
 }
-
-// ... 
 
 interface Stats {
   number_of_messages: number;
@@ -35,6 +32,7 @@ const mockChartData = [
   { name: 'May', messages: 189, points: 480, nfts: 18 },
   { name: 'Jun', messages: 239, points: 380, nfts: 22 },
 ];
+
 
 const CommunityStats = ({ stats }: { stats: Stats }) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -213,6 +211,32 @@ export default function DashboardPage() {
     }
   }, [router, walletAddress, fetchCommunities]);
 
+  const handleNFTPackSubmit = async (formData: any) => {
+    console.log("Dashboard - Received form data:", JSON.stringify(formData));
+  
+    try {
+      const response = await fetch('https://telegage-server.onrender.com/api/create-nft-pack', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      console.log("Response status:", response.status);
+      if (response.ok) {
+        const result = await response.json();
+        console.log("NFT Pack created successfully:", result);
+        // Handle success (e.g., show a success message, update UI)
+      } else {
+        console.error('Failed to create NFT Pack');
+        // Handle error (e.g., show error message to user)
+      }
+    } catch (error) {
+      console.error('Error creating NFT Pack:', error);
+      // Handle error (e.g., show error message to user)
+    }
+  };
+
   return (
     <div className="bg-black text-white min-h-screen bg-[linear-gradient(to_bottom,#000,#200D42_34%,#4F21A1_65%,#A45EDB_82%)]">
       <header className="bg-gray-900 p-4 shadow-md">
@@ -297,6 +321,10 @@ export default function DashboardPage() {
             <p className="text-center text-xl">You haven&apos;t created or imported any communities yet.</p>
           )}
         </motion.div>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4 text-white">Create NFT Pack</h2>
+          <NFTPackForm onSubmit={handleNFTPackSubmit} />
+        </div>
       </main>
     </div>
   );
