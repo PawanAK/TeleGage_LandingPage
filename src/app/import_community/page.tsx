@@ -95,11 +95,12 @@ export default function ImportCommunityPage() {
   const handleFinish = async () => {
     const channelIdMatch = groupLink.match(/\/c\/(\d+)/);
     const channelId = channelIdMatch ? channelIdMatch[1] : null;
+    const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
 
     const requestData = {
       telegram_channel_username: channelId,
       telegram_channel_rules: communityRules,
-      telegram_channel_owner: localStorage.getItem('petraAddress'),
+      telegram_channel_owner: walletAddress,
       telegram_channel_instructions: communityInstructions,
       topics: topics.map(topic => ({
         Name: topic.topicName,

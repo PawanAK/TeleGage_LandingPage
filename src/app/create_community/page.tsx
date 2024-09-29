@@ -6,6 +6,7 @@ import { TopicForm } from '@/components/TopicForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft, FaCheck } from 'react-icons/fa';
 
+
 export default function CreateCommunityPage() {
   const [step, setStep] = useState(1);
   const [communityData, setCommunityData] = useState<any>({});
@@ -33,13 +34,14 @@ export default function CreateCommunityPage() {
   };
 
   const handleFinish = async () => {
+    const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
     const requestData = {
       telegram_channel_title: communityData.communityName,
       telegram_channel_description: communityData.communityDescription,
       telegram_admin_id: communityData.telegramUsername,
       telegram_channel_rules: communityData.communityRules,
       telegram_channel_instructions: communityData.communityInstructions,
-      telegram_channel_owner: localStorage.getItem('petraAddress'),
+      telegram_channel_owner: walletAddress,
       topics: topics.map(topic => ({
         Name: topic.topicName,
         Rules: topic.topicRules,
