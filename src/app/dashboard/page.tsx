@@ -215,7 +215,7 @@ export default function DashboardPage() {
     console.log("Dashboard - Received form data:", JSON.stringify(formData));
   
     try {
-      const response = await fetch('http://localhost:3001/api/create-nft-pack', {
+      const response = await fetch('https://telegage-server.onrender.com/api/create-nft-pack', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

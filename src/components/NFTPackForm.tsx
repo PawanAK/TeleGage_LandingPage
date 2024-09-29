@@ -2,8 +2,17 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaUpload } from 'react-icons/fa';
 
+interface NFTPackData {
+  title: string;
+  price: string;
+  negative: string;
+  keywords: string;
+  altText: string;
+  imageUrl: string;
+}
+
 interface NFTPackFormProps {
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: NFTPackData) => void;
 }
 
 export const NFTPackForm = ({ onSubmit }: NFTPackFormProps) => {
@@ -33,9 +42,9 @@ export const NFTPackForm = ({ onSubmit }: NFTPackFormProps) => {
       return;
     }
 
-    const imageData = await new Promise((resolve) => {
+    const imageData = await new Promise<string>((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
+      reader.onloadend = () => resolve(reader.result as string);
       reader.readAsDataURL(imageFile);
     });
 
@@ -47,7 +56,7 @@ export const NFTPackForm = ({ onSubmit }: NFTPackFormProps) => {
 
     if (response.ok) {
       const { imageUrl } = await response.json();
-      const nftPackData = {
+      const nftPackData: NFTPackData = {
         ...formData,
         imageUrl,
       };
