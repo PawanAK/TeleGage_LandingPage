@@ -6,7 +6,9 @@ import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare } from 'lucide-react';
-import { NFTPackForm } from '@/components/NFTPackForm';
+import NFTPackForm  from '@/components/NFTPackForm';
+import AddNFTPackModal from '@/components/AddNFTPackModal';
+import NFTPacksDisplay from '@/components/NFTPacksDisplay';
 
 interface Community {
   _id: string;
@@ -154,6 +156,7 @@ export default function DashboardPage() {
   const [hasCommunity, setHasCommunity] = useState(false);
   const [communityStats, setCommunityStats] = useState<Stats | null>(null);
   const router = useRouter();
+  const [isNFTPackModalOpen, setIsNFTPackModalOpen] = useState(false);
 
   const fetchCommunities = useCallback(async () => {
     try {
@@ -322,10 +325,22 @@ export default function DashboardPage() {
           )}
         </motion.div>
         <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">Create NFT Pack</h2>
-          <NFTPackForm onSubmit={handleNFTPackSubmit} />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsNFTPackModalOpen(true)}
+            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
+          >
+            Add NFT Pack
+          </motion.button>
         </div>
       </main>
+      <AddNFTPackModal
+        isOpen={isNFTPackModalOpen}
+        onClose={() => setIsNFTPackModalOpen(false)}
+        onSubmit={handleNFTPackSubmit}
+      />
+      <NFTPacksDisplay />
     </div>
   );
 }
