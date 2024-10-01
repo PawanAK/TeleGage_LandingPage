@@ -39,21 +39,35 @@ export default function NFTPackForm({ onSubmit }: NFTPackFormProps) {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!imageFile) {
-      alert('Please select an image')
-      return
+      alert('Please select an image');
+      return;
     }
 
-    // Simulate image upload
-    const imageUrl = `https://example.com/images/${imageFile.name}`
-    const nftPackData: NFTPackData = {
-      ...formData,
-      imageUrl,
-    }
+    const imageData = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(imageFile);
+    });
 
-    onSubmit(nftPackData)
-    setSubmittedData(nftPackData)
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageData }),
+    });
+
+    if (response.ok) {
+      const { imageUrl } = await response.json();
+      const nftPackData = {
+        ...formData,
+        imageUrl,
+      };
+      console.log("NFTPackForm - Data to be submitted:", nftPackData);
+      onSubmit(nftPackData);
+    } else {
+      alert('Failed to upload image');
+    }
   }
 
   return (
