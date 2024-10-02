@@ -14,32 +14,72 @@ interface NFTPack {
   price: number
   keywords: string
   id: string
+  communityId: string
 }
 
-export default function NFTPacksGallery() {
+export default function NFTPacksGallery({ communityId }: { communityId: string }) {
   const [packs, setPacks] = useState<NFTPack[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedPack, setSelectedPack] = useState<NFTPack | null>(null)
 
   useEffect(() => {
-    const fetchNFTPacks = async () => {
-      try {
-        const response = await fetch('/api/getPacks')
-        if (!response.ok) {
-          throw new Error('Failed to fetch NFT packs')
-        }
-        const data = await response.json()
-        setPacks(data)
-        setIsLoading(false)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred')
-        setIsLoading(false)
+    const fetchAllNFTPacks = async () => {
+      if (!communityId) {
+        console.log("Waiting for communityId...");
+        return;
       }
-    }
 
-    fetchNFTPacks()
-  }, [])
+      console.log("Community ID:", communityId);
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+    
+        // Fetch NFT Superpacks
+        const superpacksResponse = await fetch('https://telegage-server.onrender.com/api/nft-superpacks');
+        if (!superpacksResponse.ok) {
+          throw new Error('Failed to fetch NFT superpacks');
+        }
+        const superpacksData = await superpacksResponse.json();
+        console.log("Superpacks Data:", superpacksData);
+    
+        // Wait for 4 seconds before making the second API call
+        await new Promise(resolve => setTimeout(resolve, 4000));
+
+        // Fetch Community NFT Packs
+        const communityPacksResponse = await fetch('https://telegage-server.onrender.com/api/nft-packs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ communityId: communityId }),
+        });
+        if (!communityPacksResponse.ok) {
+          throw new Error('Failed to fetch community NFT packs');
+        }
+        const communityPacksData = await communityPacksResponse.json();
+        console.log("Community Packs Data:", communityPacksData);
+        
+        // Combine the results
+        const combinedNFTPacks = [...superpacksData, ...communityPacksData];
+        
+        // Update state with combined results
+        setPacks(combinedNFTPacks);
+      } catch (error) {
+        console.error("Error fetching NFT packs:", error);
+        setError('Failed to load NFT packs. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllNFTPacks();
+  }, [communityId])
+
+  if (!communityId) {
+    return <div className="text-center py-10">Loading community information...</div>
+  }
 
   if (isLoading) return (
     <div className="flex justify-center items-center h-screen">

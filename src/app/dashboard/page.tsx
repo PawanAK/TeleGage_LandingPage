@@ -334,23 +334,27 @@ export default function DashboardPage() {
             <p className="text-center text-xl">You haven&apos;t created or imported any communities yet.</p>
           )}
         </motion.div>
-        <div className="mt-8">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsNFTPackModalOpen(true)}
-            className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
-          >
-            Add NFT Pack
-          </motion.button>
-        </div>
+        {hasCommunity && (
+          <>
+            <div className="mt-8">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsNFTPackModalOpen(true)}
+                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
+              >
+                Add NFT Pack
+              </motion.button>
+            </div>
+            <AddNFTPackModal
+              isOpen={isNFTPackModalOpen}
+              onClose={() => setIsNFTPackModalOpen(false)}
+              onSubmit={handleNFTPackSubmit}
+            />
+            <NFTPacksDisplay communityId={communities[0]?.community_id}/>
+          </>
+        )}
       </main>
-      <AddNFTPackModal
-        isOpen={isNFTPackModalOpen}
-        onClose={() => setIsNFTPackModalOpen(false)}
-        onSubmit={handleNFTPackSubmit}
-      />
-      <NFTPacksDisplay />
     </div>
   );
 }
