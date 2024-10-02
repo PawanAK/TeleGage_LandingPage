@@ -218,12 +218,22 @@ export default function DashboardPage() {
     console.log("Dashboard - Received form data:", JSON.stringify(formData));
   
     try {
+      // Assuming communities is an array and the first community's id should be used
+      const communityId = communities[0]?.community_id;
+      if (!communityId) {
+        throw new Error('No community found');
+      }
+
+      console.log("Dashboard - Community ID:", communityId);
+
+      const formDataWithCommunityId = { ...formData, community_id: communityId.toString() };
+
       const response = await fetch('https://telegage-server.onrender.com/api/create-nft-pack', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formDataWithCommunityId),
       });
       console.log("Response status:", response.status);
       if (response.ok) {
