@@ -5,11 +5,12 @@ import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare } from 'lucide-react';
+import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare, ImageIcon, Minus, Plus } from 'lucide-react';
 import NFTPackForm  from '@/components/NFTPackForm';
 import AddNFTPackModal from '@/components/AddNFTPackModal';
 import NFTPacksDisplay from '@/components/NFTPacksDisplay';
 import { format } from 'date-fns';
+import React from 'react';
 
 interface Community {
   _id: string;
@@ -127,27 +128,48 @@ const ActivityChart = () => (
   </div>
 );
 
-const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => (
-  <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-    <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
-      <Bell className="text-pink-500 w-6 h-6 mr-2" />
-      Recent Activity
-    </h2>
-    <ul className="space-y-4">
-      {actions.slice(0, 5).map((activity, index) => (
-        <li key={index} className="flex items-center bg-gray-700 p-3 rounded-lg">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center mr-4">
-            <User className="text-white w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-white">{activity.message}</p>
-            <p className="text-sm text-white/70">{format(new Date(activity.timestamp), 'PPpp')}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+
+
+const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
+  const getActionIcon = (message: string) => {
+    if (message.includes('deducted')) return <Minus className="text-red-500 w-6 h-6" />;
+    if (message.includes('awarded')) return <Plus className="text-green-500 w-6 h-6" />;
+    if (message.includes('Minted')) return <ImageIcon className="text-purple-500 w-6 h-6" />;
+    return <Activity className="text-blue-500 w-6 h-6" />;
+  };
+
+  const getActionColor = (message: string) => {
+    if (message.includes('deducted')) return 'bg-red-900/30';
+    if (message.includes('awarded')) return 'bg-green-900/30';
+    if (message.includes('Minted')) return 'bg-purple-900/30';
+    return 'bg-blue-900/30';
+  };
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+      <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
+        <Bell className="text-pink-500 w-6 h-6 mr-2" />
+        Recent Activity
+      </h2>
+      <ul className="space-y-4">
+        {actions.slice(0, 5).map((activity, index) => (
+          <li key={index} className={`flex items-center p-3 rounded-lg ${getActionColor(activity.message)}`}>
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-4">
+              {getActionIcon(activity.message)}
+            </div>
+            <div className="flex-grow">
+              <p className="text-white">{activity.message}</p>
+              <p className="text-sm text-white/70">{format(new Date(activity.timestamp), 'PPpp')}</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center ml-4">
+              <User className="text-white w-6 h-6" />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 const UsersToBeKickedOut = ({ users }: { users: string[] }) => (
   <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
