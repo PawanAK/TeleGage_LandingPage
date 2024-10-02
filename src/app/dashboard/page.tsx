@@ -9,7 +9,7 @@ import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, 
 import NFTPackForm  from '@/components/NFTPackForm';
 import AddNFTPackModal from '@/components/AddNFTPackModal';
 import NFTPacksDisplay from '@/components/NFTPacksDisplay';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import React from 'react';
 
 interface Community {
@@ -34,6 +34,10 @@ interface Stats {
   users_to_be_kicked_out: string[];
 }
 
+interface ChartDataPoint {
+  timestamp: Date;
+  points: number;
+}
 
 const mockChartData = [
   { name: 'Jan', messages: 400, points: 240, nfts: 20 },
@@ -108,25 +112,57 @@ const CommunityInfo = ({ community }: { community: Community }) => (
 );
 
 
-const ActivityChart = () => (
-  <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-    <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
-      <Activity className="text-purple-500 w-6 h-6 mr-2" />
-      Activity Overview
-    </h2>
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={mockChartData}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-        <XAxis dataKey="name" stroke="#888" />
-        <YAxis stroke="#888" />
-        <Tooltip contentStyle={{ backgroundColor: '#333', border: 'none' }} />
-        <Line type="monotone" dataKey="messages" stroke="#8884d8" />
-        <Line type="monotone" dataKey="points" stroke="#82ca9d" />
-        <Line type="monotone" dataKey="nfts" stroke="#ffc658" />
-      </LineChart>
-    </ResponsiveContainer>
-  </div>
-);
+const ActivityChart = ({ actions }: { actions: Stats['actions'] }) => {
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+
+  useEffect(() => {
+    const processedData = actions.reduce((acc: ChartDataPoint[], action) => {
+      const timestamp = parseISO(action.timestamp);
+      let pointChange = 0;
+
+      if (action.message.includes('awarded')) {
+        pointChange = parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
+      } else if (action.message.includes('deducted')) {
+        pointChange = -parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
+      }
+
+      const lastPoint = acc[acc.length - 1]?.points || 0;
+      acc.push({
+        timestamp,
+        points: lastPoint + pointChange
+      });
+
+      return acc;
+    }, []);
+
+    setChartData(processedData);
+  }, [actions]);
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+      <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
+        <Activity className="text-purple-500 w-6 h-6 mr-2" />
+        Activity Overview
+      </h2>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+          <XAxis 
+            dataKey="timestamp" 
+            stroke="#888" 
+            tickFormatter={(timestamp) => format(new Date(timestamp), 'MMM dd HH:mm')}
+          />
+          <YAxis stroke="#888" />
+          <Tooltip 
+            contentStyle={{ backgroundColor: '#333', border: 'none' }}
+            labelFormatter={(value) => format(new Date(value), 'MMM dd, yyyy HH:mm:ss')}
+          />
+          <Line type="monotone" dataKey="points" stroke="#8884d8" dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
 
 
@@ -355,7 +391,7 @@ export default function DashboardPage() {
               <CommunityInfo community={communities[0]} />
               <CommunityStats stats={communityStats} />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <ActivityChart />
+                <ActivityChart actions={communityStats.actions} />
                 <RecentActivity actions={communityStats.actions} />
               </div>
               {communityStats.users_to_be_kicked_out.length > 0 && (
