@@ -30,11 +30,12 @@ export default function RootLayout({
         >
     <WalletProvider>
         {children}
+        <SpeedInsights />
+        <Analytics />
         </WalletProvider>
         </ThemeProvider>
         
-        <SpeedInsights />
-        <Analytics />
+      
       </body>
     </html>
   );
