@@ -50,9 +50,11 @@ export const Hero = () => {
           Empower your Telegram community with automated moderation, engagement boosting, and Web3 rewards.
           </p>
         </div>
+        <Link href='/auth'>
         <div className="flex justify-center mt-8 ">
-          <button className="bg-white text-black py-3 px-5 rounded-xl font-medium shadow-xl">Get for free</button>
+          <button className="bg-white text-black py-3 px-5 rounded-xl font-medium shadow-xl">Start your journey</button>
         </div>
+        </Link>
       </div>
     </div>
   );
