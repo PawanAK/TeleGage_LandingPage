@@ -45,7 +45,7 @@ export default function NFTPacksGallery({ communityId }: { communityId: string }
         console.log("Superpacks Data:", superpacksData);
     
         // Wait for 4 seconds before making the second API call
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        // await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Fetch Community NFT Packs
         const communityPacksResponse = await fetch('https://telegage-server.onrender.com/api/nft-packs', {

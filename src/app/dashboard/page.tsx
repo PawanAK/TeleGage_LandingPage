@@ -26,6 +26,7 @@ interface Stats {
   points_earned: number;
 }
 
+
 const mockChartData = [
   { name: 'Jan', messages: 400, points: 240, nfts: 20 },
   { name: 'Feb', messages: 300, points: 139, nfts: 15 },
@@ -103,6 +104,7 @@ const CommunityInfo = ({ community }: { community: Community }) => (
   </div>
 );
 
+
 const ActivityChart = () => (
   <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
     <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
@@ -157,6 +159,7 @@ export default function DashboardPage() {
   const [communityStats, setCommunityStats] = useState<Stats | null>(null);
   const router = useRouter();
   const [isNFTPackModalOpen, setIsNFTPackModalOpen] = useState(false);
+  const [showNFTs, setShowNFTs] = useState(false);
 
   const fetchCommunities = useCallback(async () => {
     try {
@@ -336,7 +339,7 @@ export default function DashboardPage() {
         </motion.div>
         {hasCommunity && (
           <>
-            <div className="mt-8">
+            <div className="mt-8 flex space-x-4">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -345,13 +348,21 @@ export default function DashboardPage() {
               >
                 Add NFT Pack
               </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowNFTs(!showNFTs)}
+                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
+              >
+                {showNFTs ? 'Hide NFTs' : 'Display NFTs'}
+              </motion.button>
             </div>
             <AddNFTPackModal
               isOpen={isNFTPackModalOpen}
               onClose={() => setIsNFTPackModalOpen(false)}
               onSubmit={handleNFTPackSubmit}
             />
-            <NFTPacksDisplay communityId={communities[0]?.community_id}/>
+            {showNFTs && <NFTPacksDisplay communityId={communities[0]?.community_id}/>}
           </>
         )}
       </main>
