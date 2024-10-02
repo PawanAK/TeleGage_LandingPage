@@ -9,6 +9,7 @@ import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, 
 import NFTPackForm  from '@/components/NFTPackForm';
 import AddNFTPackModal from '@/components/AddNFTPackModal';
 import NFTPacksDisplay from '@/components/NFTPacksDisplay';
+import { format } from 'date-fns';
 
 interface Community {
   _id: string;
@@ -21,9 +22,15 @@ interface Community {
 }
 
 interface Stats {
-  number_of_messages: number;
-  number_of_nfts_minted: number;
-  points_earned: number;
+  number_of_messages: string;
+  number_of_nfts_minted: string;
+  points_earned: string;
+  actions: Array<{
+    message: string;
+    timestamp: string;
+    username: string;
+  }>;
+  users_to_be_kicked_out: string[];
 }
 
 
@@ -93,13 +100,8 @@ const CommunityInfo = ({ community }: { community: Community }) => (
       </div>
     </div>
     <div className="bg-gray-700 p-4 rounded-lg">
-      <h3 className="text-lg font-semibold mb-2 text-white/80">Description</h3>
+      <h3 className="text-lg font-semibold mb-2 text-white/80">Description </h3>
       <p className="text-white/80 leading-relaxed">{community.community_description}</p>
-    </div>
-    <div className="mt-4 flex justify-end">
-      <button className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition duration-300">
-        Manage Community
-      </button>
     </div>
   </div>
 );
@@ -125,26 +127,38 @@ const ActivityChart = () => (
   </div>
 );
 
-const RecentActivity = () => (
+const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => (
   <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
     <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
       <Bell className="text-pink-500 w-6 h-6 mr-2" />
       Recent Activity
     </h2>
     <ul className="space-y-4">
-      {[
-        { name: 'John Doe', action: 'joined the community', time: '2 hours ago', color: 'bg-purple-500' },
-        { name: 'Alice Smith', action: 'minted a new NFT', time: '5 hours ago', color: 'bg-pink-500' },
-        { name: 'Bob Johnson', action: 'earned 100 points', time: '1 day ago', color: 'bg-indigo-500' },
-      ].map((activity, index) => (
+      {actions.slice(0, 5).map((activity, index) => (
         <li key={index} className="flex items-center bg-gray-700 p-3 rounded-lg">
-          <div className={`w-10 h-10 rounded-full ${activity.color} flex items-center justify-center mr-4`}>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center mr-4">
             <User className="text-white w-6 h-6" />
           </div>
           <div>
-            <p className="text-white">{activity.name} {activity.action}</p>
-            <p className="text-sm text-white/70">{activity.time}</p>
+            <p className="text-white">{activity.message}</p>
+            <p className="text-sm text-white/70">{format(new Date(activity.timestamp), 'PPpp')}</p>
           </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+const UsersToBeKickedOut = ({ users }: { users: string[] }) => (
+  <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+    <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
+      <Users className="text-red-500 w-6 h-6 mr-2" />
+      Users to be Kicked Out
+    </h2>
+    <ul className="space-y-2">
+      {users.map((user, index) => (
+        <li key={index} className="bg-gray-700 p-2 rounded-lg text-white">
+          {user}
         </li>
       ))}
     </ul>
@@ -198,6 +212,7 @@ export default function DashboardPage() {
         body: JSON.stringify({ walletAddress, communityId }),
       });
       const data = await response.json();
+      console.log("Community Statsssssssssss:", data);
       setCommunityStats(data.Stats);
     } catch (error) {
       console.error('Error fetching community stats:', error);
@@ -313,58 +328,49 @@ export default function DashboardPage() {
             </div>
           )}
           
-          {hasCommunity ? (
-            communities.length > 0 ? (
-              communities.map((community) => (
-                <motion.div
-                  key={community._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
+          {hasCommunity && communityStats && (
+            <>
+              <CommunityInfo community={communities[0]} />
+              <CommunityStats stats={communityStats} />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <ActivityChart />
+                <RecentActivity actions={communityStats.actions} />
+              </div>
+              {communityStats.users_to_be_kicked_out.length > 0 && (
+                <UsersToBeKickedOut users={communityStats.users_to_be_kicked_out} />
+              )}
+            </>
+          )}
+          
+          {hasCommunity && (
+            <>
+              <div className="mt-8 flex space-x-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsNFTPackModalOpen(true)}
+                  className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
                 >
-                  <CommunityInfo community={community} />
-                  {communityStats && <CommunityStats stats={communityStats} />}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <ActivityChart />
-                    <RecentActivity />
-                  </div>
-                </motion.div>
-              ))
-            ) : (
-              <p className="text-center text-xl">Loading communities...</p>
-            )
-          ) : (
-            <p className="text-center text-xl">You haven&apos;t created or imported any communities yet.</p>
+                  Add NFT Pack
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowNFTs(!showNFTs)}
+                  className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
+                >
+                  {showNFTs ? 'Hide NFTs' : 'Display NFTs'}
+                </motion.button>
+              </div>
+              <AddNFTPackModal
+                isOpen={isNFTPackModalOpen}
+                onClose={() => setIsNFTPackModalOpen(false)}
+                onSubmit={handleNFTPackSubmit}
+              />
+              {showNFTs && <NFTPacksDisplay communityId={communities[0]?.community_id}/>}
+            </>
           )}
         </motion.div>
-        {hasCommunity && (
-          <>
-            <div className="mt-8 flex space-x-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsNFTPackModalOpen(true)}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
-              >
-                Add NFT Pack
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowNFTs(!showNFTs)}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
-              >
-                {showNFTs ? 'Hide NFTs' : 'Display NFTs'}
-              </motion.button>
-            </div>
-            <AddNFTPackModal
-              isOpen={isNFTPackModalOpen}
-              onClose={() => setIsNFTPackModalOpen(false)}
-              onSubmit={handleNFTPackSubmit}
-            />
-            {showNFTs && <NFTPacksDisplay communityId={communities[0]?.community_id}/>}
-          </>
-        )}
       </main>
     </div>
   );
