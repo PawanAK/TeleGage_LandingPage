@@ -286,6 +286,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [isNFTPackModalOpen, setIsNFTPackModalOpen] = useState(false);
   const [showNFTs, setShowNFTs] = useState(false);
+  const [isCommunityLoading, setIsCommunityLoading] = useState(true);
 
   const fetchCommunities = useCallback(async () => {
     try {
@@ -303,6 +304,7 @@ export default function DashboardPage() {
         setCommunities(data);
         setHasCommunity(data.length > 0);
         if (data.length > 0) fetchCommunityStats(data[0].id);
+        setIsCommunityLoading(false);
       } else {
         console.error('Fetched communities data is not an array:', data);
         setCommunities([]);
@@ -333,6 +335,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const user = localStorage.getItem('user');
+    setIsCommunityLoading(true);
     if (!user) {
       router.push('/auth');
     } else {
@@ -419,67 +422,70 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {!hasCommunity && (
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => router.push('/create_community')}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
-              >
-                Create Your Community
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => router.push('/import_community')}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
-              >
-                Import Your Community
-              </motion.button>
+          {isCommunityLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
             </div>
-          )}
-          
-          {hasCommunity && communityStats && (
+          ) : (
             <>
-              <CommunityInfo community={communities[0]} />
-              <CommunityStats stats={communityStats} />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <ActivityChart actions={communityStats.actions} />
-                <RecentActivity actions={communityStats.actions} />
-              </div>
-              {communityStats.users_to_be_kicked_out.length > 0 && (
-                <UsersToBeKickedOut users={communityStats.users_to_be_kicked_out} />
+              {!hasCommunity && (
+                <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => router.push('/create_community')}
+                    className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
+                  >
+                    Create Your Community
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => router.push('/import_community')}
+                    className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300"
+                  >
+                    Import Your Community
+                  </motion.button>
+                </div>
               )}
-            </>
-          )}
-          
-          {hasCommunity && (
-            <>
-              <div className="mt-8 flex space-x-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setIsNFTPackModalOpen(true)}
-                  className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
-                >
-                  Add NFT Pack
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowNFTs(!showNFTs)}
-                  className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
-                >
-                  {showNFTs ? 'Hide NFTs' : 'Display NFTs'}
-                </motion.button>
-              </div>
-              <AddNFTPackModal
-                isOpen={isNFTPackModalOpen}
-                onClose={() => setIsNFTPackModalOpen(false)}
-                onSubmit={handleNFTPackSubmit}
-              />
-              {showNFTs && <NFTPacksDisplay communityId={communities[0]?.community_id}/>}
+              
+              {hasCommunity && communityStats && (
+                <>
+                  <CommunityInfo community={communities[0]} />
+                  <CommunityStats stats={communityStats} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <ActivityChart actions={communityStats.actions} />
+                    <RecentActivity actions={communityStats.actions} />
+                  </div>
+                  {communityStats.users_to_be_kicked_out.length > 0 && (
+                    <UsersToBeKickedOut users={communityStats.users_to_be_kicked_out} />
+                  )}
+                  <div className="mt-8 flex space-x-4">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setIsNFTPackModalOpen(true)}
+                      className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
+                    >
+                      Add NFT Pack
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setShowNFTs(!showNFTs)}
+                      className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300"
+                    >
+                      {showNFTs ? 'Hide NFTs' : 'Display NFTs'}
+                    </motion.button>
+                  </div>
+                  <AddNFTPackModal
+                    isOpen={isNFTPackModalOpen}
+                    onClose={() => setIsNFTPackModalOpen(false)}
+                    onSubmit={handleNFTPackSubmit}
+                  />
+                  {showNFTs && <NFTPacksDisplay communityId={communities[0]?.community_id}/>}
+                </>
+              )}
             </>
           )}
         </motion.div>
