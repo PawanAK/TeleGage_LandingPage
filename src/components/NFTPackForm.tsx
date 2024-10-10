@@ -25,7 +25,6 @@ export default function NFTPackForm({ onSubmit }: NFTPackFormProps) {
     imageUrl: '',
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
-  const [submittedData, setSubmittedData] = useState<NFTPackData | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -71,16 +70,15 @@ export default function NFTPackForm({ onSubmit }: NFTPackFormProps) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <motion.form
         onSubmit={handleSubmit}
-        className="space-y-4 bg-gray-800 p-6 rounded-lg shadow-lg"
+        className="space-y-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">
               Title
@@ -186,44 +184,6 @@ export default function NFTPackForm({ onSubmit }: NFTPackFormProps) {
           Create NFT Pack
         </motion.button>
       </motion.form>
-
-      {submittedData && (
-        <motion.div
-          className="bg-gray-800 p-6 rounded-lg shadow-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h3 className="text-xl font-bold text-white mb-4">Submitted NFT Pack Data</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-gray-300">
-                <span className="font-medium">Title:</span> {submittedData.title}
-              </p>
-              <p className="text-gray-300">
-                <span className="font-medium">Price:</span> {submittedData.price}
-              </p>
-              <p className="text-gray-300">
-                <span className="font-medium">Negative Keywords:</span> {submittedData.negative}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-300">
-                <span className="font-medium">Keywords:</span> {submittedData.keywords}
-              </p>
-              <p className="text-gray-300">
-                <span className="font-medium">Alt Text:</span> {submittedData.altText}
-              </p>
-              <p className="text-gray-300">
-                <span className="font-medium">Image URL:</span> {submittedData.imageUrl}
-              </p>
-            </div>
-          </div>
-          {submittedData.imageUrl && (
-            <img src={submittedData.imageUrl} alt={submittedData.altText} className="mt-4 max-w-full h-auto rounded-md" />
-          )}
-        </motion.div>
-      )}
     </div>
   )
 }

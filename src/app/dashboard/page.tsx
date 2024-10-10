@@ -360,6 +360,7 @@ export default function DashboardPage() {
       console.log("Dashboard - Community ID:", communityId);
 
       const formDataWithCommunityId = { ...formData, community_id: communityId.toString() };
+      console.log("nft - Form data with community ID:", JSON.stringify(formDataWithCommunityId));
 
       const response = await fetch('https://telegage-server.onrender.com/api/create-nft-pack', {
         method: 'POST',
