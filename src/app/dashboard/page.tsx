@@ -5,7 +5,7 @@ import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare, ImageIcon, Minus, Plus } from 'lucide-react';
+import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare, ImageIcon, Minus, Plus, UserPlus } from 'lucide-react';
 import NFTPackForm  from '@/components/NFTPackForm';
 import AddNFTPackModal from '@/components/AddNFTPackModal';
 import NFTPacksDisplay from '@/components/NFTPacksDisplay';
@@ -37,7 +37,7 @@ interface Stats {
 interface ChartDataPoint {
   timestamp: Date;
   points: number;
-  messages: number;
+  users: number;
   nfts: number;
 }
 
@@ -114,15 +114,14 @@ const CommunityInfo = ({ community }: { community: Community }) => (
 );
 
 
-
 interface ChartDataPoint {
   timestamp: Date;
   points: number;
-  messages: number;
+  users: number;
   nfts: number;
 }
 
-const ActivityChart = ({ actions, messageCount }: { actions: Stats['actions'], messageCount: number }) => {
+const ActivityChart = ({ actions, userCount }: { actions: Stats['actions'], userCount: number }) => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
@@ -130,7 +129,7 @@ const ActivityChart = ({ actions, messageCount }: { actions: Stats['actions'], m
       const timestamp = parseISO(action.timestamp);
       let pointChange = 0;
       let nftChange = 0;
-      let messageChange = 0;
+      let userChange = 0;
 
       if (action.message.includes('awarded')) {
         pointChange = parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
@@ -138,16 +137,18 @@ const ActivityChart = ({ actions, messageCount }: { actions: Stats['actions'], m
         pointChange = -parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
       } else if (action.message.includes('Minted')) {
         nftChange = 1;
+      } else if (action.message.includes('joined the Community')) {
+        userChange = 1;
       }
 
-      // Distribute message count evenly across all actions
-      messageChange = index === actions.length - 1 ? messageCount % actions.length : Math.floor(messageCount / actions.length);
+      // Distribute user count evenly across all actions
+      userChange += index === actions.length - 1 ? userCount % actions.length : Math.floor(userCount / actions.length);
 
-      const lastPoint = acc[acc.length - 1] || { points: 0, messages: 0, nfts: 0 };
+      const lastPoint = acc[acc.length - 1] || { points: 0, users: 0, nfts: 0 };
       acc.push({
         timestamp,
         points: lastPoint.points + pointChange,
-        messages: lastPoint.messages + messageChange,
+        users: lastPoint.users + userChange,
         nfts: lastPoint.nfts + nftChange
       });
 
@@ -155,7 +156,9 @@ const ActivityChart = ({ actions, messageCount }: { actions: Stats['actions'], m
     }, []);
 
     setChartData(processedData);
-  }, [actions, messageCount]);
+  }, [actions, userCount]);
+
+  // ... rest of the component (update the LineChart to use 'users' instead of 'messages')
 
   console.log("chartData:", chartData);
 
@@ -199,11 +202,11 @@ const ActivityChart = ({ actions, messageCount }: { actions: Stats['actions'], m
           />
           <Line 
             type="monotone" 
-            dataKey="messages" 
+            dataKey="users" 
             stroke="#82ca9d" 
             strokeWidth={2}
             dot={false} 
-            name="Messages" 
+            name="Users" 
             yAxisId="right"
           />
           <Line 
@@ -228,6 +231,7 @@ const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
     if (message.includes('deducted')) return <Minus className="text-red-500 w-6 h-6" />;
     if (message.includes('awarded')) return <Plus className="text-green-500 w-6 h-6" />;
     if (message.includes('Minted')) return <ImageIcon className="text-purple-500 w-6 h-6" />;
+    if (message.includes('joined')) return <UserPlus className="text-blue-500 w-6 h-6" />;
     return <Activity className="text-blue-500 w-6 h-6" />;
   };
 
@@ -235,6 +239,7 @@ const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
     if (message.includes('deducted')) return 'bg-red-900/30';
     if (message.includes('awarded')) return 'bg-green-900/30';
     if (message.includes('Minted')) return 'bg-purple-900/30';
+    if (message.includes('joined')) return 'bg-blue-900/30';
     return 'bg-blue-900/30';
   };
 
@@ -458,7 +463,7 @@ export default function DashboardPage() {
                   <CommunityInfo community={communities[0]} />
                   <CommunityStats stats={communityStats} />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <ActivityChart actions={communityStats.actions} messageCount={parseInt(communityStats.number_of_messages)} />
+                  <ActivityChart actions={communityStats.actions} userCount={communities[0]?.users.length || 0} />
                     <RecentActivity actions={communityStats.actions} />
                   </div>
                   {communityStats.users_to_be_kicked_out.length > 0 && (
