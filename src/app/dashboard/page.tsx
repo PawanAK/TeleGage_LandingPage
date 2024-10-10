@@ -122,25 +122,26 @@ interface ChartDataPoint {
   nfts: number;
 }
 
-const ActivityChart = ({ actions }: { actions: Stats['actions'] }) => {
+const ActivityChart = ({ actions, messageCount }: { actions: Stats['actions'], messageCount: number }) => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
-    const processedData = actions.reduce((acc: ChartDataPoint[], action) => {
+    const processedData = actions.reduce((acc: ChartDataPoint[], action, index) => {
       const timestamp = parseISO(action.timestamp);
       let pointChange = 0;
-      let messageChange = 0;
       let nftChange = 0;
+      let messageChange = 0;
 
       if (action.message.includes('awarded')) {
         pointChange = parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
       } else if (action.message.includes('deducted')) {
         pointChange = -parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
-      } else if (action.message.includes('sent a message')) {
-        messageChange = 1;
       } else if (action.message.includes('Minted')) {
         nftChange = 1;
       }
+
+      // Distribute message count evenly across all actions
+      messageChange = index === actions.length - 1 ? messageCount % actions.length : Math.floor(messageCount / actions.length);
 
       const lastPoint = acc[acc.length - 1] || { points: 0, messages: 0, nfts: 0 };
       acc.push({
@@ -154,7 +155,9 @@ const ActivityChart = ({ actions }: { actions: Stats['actions'] }) => {
     }, []);
 
     setChartData(processedData);
-  }, [actions]);
+  }, [actions, messageCount]);
+
+  console.log("chartData:", chartData);
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
@@ -455,7 +458,7 @@ export default function DashboardPage() {
                   <CommunityInfo community={communities[0]} />
                   <CommunityStats stats={communityStats} />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <ActivityChart actions={communityStats.actions} />
+                  <ActivityChart actions={communityStats.actions} messageCount={parseInt(communityStats.number_of_messages)} />
                     <RecentActivity actions={communityStats.actions} />
                   </div>
                   {communityStats.users_to_be_kicked_out.length > 0 && (
