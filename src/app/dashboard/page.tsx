@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logoImg from '../../assets/images/logosaas.png';
 import { motion } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare, ImageIcon, Minus, Plus } from 'lucide-react';
 import NFTPackForm  from '@/components/NFTPackForm';
 import AddNFTPackModal from '@/components/AddNFTPackModal';
@@ -37,6 +37,8 @@ interface Stats {
 interface ChartDataPoint {
   timestamp: Date;
   points: number;
+  messages: number;
+  nfts: number;
 }
 
 const mockChartData = [
@@ -112,6 +114,14 @@ const CommunityInfo = ({ community }: { community: Community }) => (
 );
 
 
+
+interface ChartDataPoint {
+  timestamp: Date;
+  points: number;
+  messages: number;
+  nfts: number;
+}
+
 const ActivityChart = ({ actions }: { actions: Stats['actions'] }) => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
@@ -119,17 +129,25 @@ const ActivityChart = ({ actions }: { actions: Stats['actions'] }) => {
     const processedData = actions.reduce((acc: ChartDataPoint[], action) => {
       const timestamp = parseISO(action.timestamp);
       let pointChange = 0;
+      let messageChange = 0;
+      let nftChange = 0;
 
       if (action.message.includes('awarded')) {
         pointChange = parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
       } else if (action.message.includes('deducted')) {
         pointChange = -parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
+      } else if (action.message.includes('sent a message')) {
+        messageChange = 1;
+      } else if (action.message.includes('Minted')) {
+        nftChange = 1;
       }
 
-      const lastPoint = acc[acc.length - 1]?.points || 0;
+      const lastPoint = acc[acc.length - 1] || { points: 0, messages: 0, nfts: 0 };
       acc.push({
         timestamp,
-        points: lastPoint + pointChange
+        points: lastPoint.points + pointChange,
+        messages: lastPoint.messages + messageChange,
+        nfts: lastPoint.nfts + nftChange
       });
 
       return acc;
@@ -150,14 +168,50 @@ const ActivityChart = ({ actions }: { actions: Stats['actions'] }) => {
           <XAxis 
             dataKey="timestamp" 
             stroke="#888" 
-            tickFormatter={(timestamp) => format(new Date(timestamp), 'MMM dd HH:mm')}
+            tickFormatter={(timestamp) => format(new Date(timestamp), 'MMM dd')}
           />
-          <YAxis stroke="#888" />
+          <YAxis 
+            stroke="#888"
+            yAxisId="left"
+            tickFormatter={(value) => `${value / 1000}k`}
+          />
+          <YAxis 
+            stroke="#888"
+            yAxisId="right"
+            orientation="right"
+          />
           <Tooltip 
             contentStyle={{ backgroundColor: '#333', border: 'none' }}
             labelFormatter={(value) => format(new Date(value), 'MMM dd, yyyy HH:mm:ss')}
           />
-          <Line type="monotone" dataKey="points" stroke="#8884d8" dot={false} />
+          <Legend />
+          <Line 
+            type="monotone" 
+            dataKey="points" 
+            stroke="#8884d8" 
+            strokeWidth={2}
+            dot={false} 
+            name="Points" 
+            yAxisId="left"
+          />
+          <Line 
+            type="monotone" 
+            dataKey="messages" 
+            stroke="#82ca9d" 
+            strokeWidth={2}
+            dot={false} 
+            name="Messages" 
+            yAxisId="right"
+          />
+          <Line 
+            type="monotone" 
+            dataKey="nfts" 
+            stroke="#ffc658" 
+            strokeWidth={2}
+            dot={false} 
+            name="NFTs" 
+            yAxisId="right"
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

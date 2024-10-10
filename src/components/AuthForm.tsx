@@ -48,7 +48,11 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
                     console.log("Login with credentials successful", response.data);
                     setSuccessMessage(response.data.message);
                     setErrorMessage("");
-                    localStorage.setItem('user', JSON.stringify({ username, has_community: response.data.has_community }));
+                    localStorage.setItem('user', JSON.stringify({
+                        username: response.data.username,
+                        walletAddress: response.data.walletAddress,
+                        has_community: response.data.has_community
+                    }));
                     router.push('/dashboard');
                 }
             } else {
