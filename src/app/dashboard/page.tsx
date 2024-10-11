@@ -237,7 +237,7 @@ const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
     if (message.includes('awarded')) return <Plus className="text-green-500 w-6 h-6" />;
     if (message.includes('Minted')) return <ImageIcon className="text-purple-500 w-6 h-6" />;
     if (message.includes('joined')) return <UserPlus className="text-blue-500 w-6 h-6" />;
-    if (message.includes('kicked')) return <Trash2 className="text-red-500 w-6 h-6" />;
+    if (message.includes('Kicked')) return <Trash2 className="text-red-500 w-6 h-6" />;
     return <Activity className="text-blue-500 w-6 h-6" />;
   };
 
