@@ -237,6 +237,7 @@ const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
     if (message.includes('awarded')) return <Plus className="text-green-500 w-6 h-6" />;
     if (message.includes('Minted')) return <ImageIcon className="text-purple-500 w-6 h-6" />;
     if (message.includes('joined')) return <UserPlus className="text-blue-500 w-6 h-6" />;
+    if (message.includes('kicked')) return <Trash2 className="text-red-500 w-6 h-6" />;
     return <Activity className="text-blue-500 w-6 h-6" />;
   };
 
@@ -245,6 +246,7 @@ const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
     if (message.includes('awarded')) return 'bg-green-900/30';
     if (message.includes('Minted')) return 'bg-purple-900/30';
     if (message.includes('joined')) return 'bg-blue-900/30';
+    if (message.includes('kicked')) return 'bg-red-900/30';
     return 'bg-blue-900/30';
   };
 
