@@ -21,7 +21,7 @@ export const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
         if (connected && account) {
             handleWalletLogin(account.address);
         }
-    }, [connected, account]);
+    }, [connected, account ]);
 
     const handleWalletLogin = async (walletAddress: string) => {
         try {

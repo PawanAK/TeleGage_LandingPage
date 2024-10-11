@@ -5,7 +5,7 @@ import Image from 'next/image';
 import logoImg from '../../assets/images/Telegage_logo.png';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare, ImageIcon, Minus, Plus, UserPlus } from 'lucide-react';
+import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare, ImageIcon, Minus, Plus, UserPlus, Trash2 } from 'lucide-react';
 import NFTPackForm  from '@/components/NFTPackForm';
 import AddNFTPackModal from '@/components/AddNFTPackModal';
 import NFTPacksDisplay from '@/components/NFTPacksDisplay';
@@ -249,41 +249,89 @@ const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
         <Bell className="text-pink-500 w-6 h-6 mr-2" />
         Recent Activity
       </h2>
-      <ul className="space-y-4">
-        {actions.slice(0, 5).map((activity, index) => (
-          <li key={index} className={`flex items-center p-3 rounded-lg ${getActionColor(activity.message)}`}>
-            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-4">
-              {getActionIcon(activity.message)}
+      <div className="max-h-80 overflow-y-auto">
+        <ul className="space-y-4">
+          {actions.slice().reverse().map((activity, index) => (
+            <li key={index} className={`flex items-center p-3 rounded-lg ${getActionColor(activity.message)}`}>
+              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-4">
+                {getActionIcon(activity.message)}
+              </div>
+              <div className="flex-grow">
+                <p className="text-white">{activity.message}</p>
+                <p className="text-sm text-white/70">{format(new Date(activity.timestamp), 'PPpp')}</p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center ml-4">
+                <User className="text-white w-6 h-6" />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+interface UserToKick {
+  timestamp: string;
+  username: string;
+  user_id: string;
+}
+
+const UsersToBeKickedOut = ({ users, communityId }: { users: UserToKick[], communityId: string }) => {
+  const handleKickUser = async (user: UserToKick) => {
+    try {
+      const response = await fetch('https://tegegageapplication.onrender.com/kick_user_from_community', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          telegram_channel_username: communityId,
+          user_name: user.user_id,
+        }),
+      });
+      console.log("body to kick out:", JSON.stringify({
+        telegram_channel_username: communityId,
+        user_name: user.user_id,
+      }));
+
+      if (response.ok) {
+        console.log(`User ${user.username} kicked out successfully`);
+        // You might want to update the UI or refetch the users list here
+      } else {
+        console.error('Failed to kick out user');
+      }
+    } catch (error) {
+      console.error('Error kicking out user:', error);
+    }
+  };
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+      <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
+        <Users className="text-red-500 w-6 h-6 mr-2" />
+        Users to be Kicked Out
+      </h2>
+      <ul className="space-y-2">
+        {users.map((user, index) => (
+          <li key={index} className="bg-gray-700 p-2 rounded-lg text-white flex justify-between items-center">
+            <div>
+              <span>{user.username}</span>
+              <span className="text-sm text-gray-400 ml-2">({user.user_id})</span>
             </div>
-            <div className="flex-grow">
-              <p className="text-white">{activity.message}</p>
-              <p className="text-sm text-white/70">{format(new Date(activity.timestamp), 'PPpp')}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center ml-4">
-              <User className="text-white w-6 h-6" />
-            </div>
+            <button
+              onClick={() => handleKickUser(user)}
+              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition duration-300"
+              title="Kick out user"
+            >
+              <Trash2 size={16} />
+            </button>
           </li>
         ))}
       </ul>
     </div>
   );
 };
-
-const UsersToBeKickedOut = ({ users }: { users: string[] }) => (
-  <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-    <h2 className="text-2xl font-bold mb-4 text-white flex items-center">
-      <Users className="text-red-500 w-6 h-6 mr-2" />
-      Users to be Kicked Out
-    </h2>
-    <ul className="space-y-2">
-      {users.map((user, index) => (
-        <li key={index} className="bg-gray-700 p-2 rounded-lg text-white">
-          {user}
-        </li>
-      ))}
-    </ul>
-  </div>
-);
 
 export default function DashboardPage() {
   const [username, setUsername] = useState('');
@@ -467,7 +515,10 @@ export default function DashboardPage() {
                     <RecentActivity actions={communityStats.actions} />
                   </div>
                   {communityStats.users_to_be_kicked_out.length > 0 && (
-                    <UsersToBeKickedOut users={communityStats.users_to_be_kicked_out} />
+                    <UsersToBeKickedOut 
+                      users={communityStats.users_to_be_kicked_out} 
+                      communityId={communities[0]?.community_id}
+                    />
                   )}
                   <div className="mt-8 flex space-x-4">
                     <motion.button
