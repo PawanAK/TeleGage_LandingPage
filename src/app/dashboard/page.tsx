@@ -31,7 +31,7 @@ interface Stats {
     timestamp: string;
     username: string;
   }>;
-  users_to_be_kicked_out: string[];
+  users_to_be_kicked_out: UserToKick[];
 }
 
 interface ChartDataPoint {
