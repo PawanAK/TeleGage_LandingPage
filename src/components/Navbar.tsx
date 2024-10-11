@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import logoImg from '../assets/images/logosaas.png';
+import logoImg from '../assets/images/Telegage_logo.png';
 import MenuIcon from '../assets/icons/menu.svg';
 import Link from 'next/link';
 
@@ -9,8 +9,8 @@ export const Navbar = () => {
       <div className="container">
         <div className='py-4 flex items-center justify-between'>
           <div className='relative'>
-            <div className='absolute w-full top-0 bottom-0 bg-[linear-gradient(to_right,#F87BFF,#FB92CF,#FFDD9B,#C2F0B1,#2FD8FE)] blur-md'></div>
-            <Image src={logoImg} alt="saas logo" className='w-12 h-12 relative' />
+            <div className='absolute w-full top-0 bottom-0 blur-md'></div>
+            <Image src={logoImg} alt="saas logo" className='w-20 h-20 relative' />
           </div>
           <div className='border border-white border-opacity-25 h-10 w-10 rounded-lg inline-flex items-center justify-center sm:hidden'>
             <MenuIcon />

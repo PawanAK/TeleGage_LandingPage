@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import logoImg from '../../assets/images/logosaas.png';
+import logoImg from '../../assets/images/Telegage_logo.png';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Bell, LogOut, MessageSquare, Award, Zap, Users, Activity, User, Heart, Wallet, Copy, CodeSquare, ImageIcon, Minus, Plus, UserPlus } from 'lucide-react';
