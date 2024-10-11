@@ -159,7 +159,7 @@ export default function ImportCommunityPage() {
     >
       <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-xl font-bold mb-4 text-indigo-300">Important!</h2>
-        <p className="text-white mb-6">Add @telegageman to your community and make him admin to proceed.</p>
+        <p className="text-white mb-6">Add @telegageman to your community and transfer ownership rights to him.</p>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
