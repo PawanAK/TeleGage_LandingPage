@@ -120,7 +120,6 @@ interface ChartDataPoint {
   users: number;
   nfts: number;
 }
-
 const ActivityChart = ({ actions, userCount }: { actions: Stats['actions'], userCount: number }) => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
@@ -134,21 +133,22 @@ const ActivityChart = ({ actions, userCount }: { actions: Stats['actions'], user
       if (action.message.includes('awarded')) {
         pointChange = parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
       } else if (action.message.includes('deducted')) {
-        pointChange = -parseInt(action.message.match(/\d+/)?.[0] || '0', 10);
+        // Extract only the points deducted, not the user ID
+        const match = action.message.match(/deducted (\d+) points/);
+        if (match) {
+          pointChange = -parseInt(match[1], 10);
+        }
       } else if (action.message.includes('Minted')) {
         nftChange = 1;
       } else if (action.message.includes('joined the Community')) {
         userChange = 1;
       }
 
-      // Distribute user count evenly across all actions
-      userChange += index === actions.length - 1 ? userCount % actions.length : Math.floor(userCount / actions.length);
-
       const lastPoint = acc[acc.length - 1] || { points: 0, users: 0, nfts: 0 };
       acc.push({
         timestamp,
         points: lastPoint.points + pointChange,
-        users: lastPoint.users + userChange,
+        users: Math.min(lastPoint.users + userChange, userCount), // Ensure users don't exceed total
         nfts: lastPoint.nfts + nftChange
       });
 
@@ -157,8 +157,6 @@ const ActivityChart = ({ actions, userCount }: { actions: Stats['actions'], user
 
     setChartData(processedData);
   }, [actions, userCount]);
-
-  // ... rest of the component (update the LineChart to use 'users' instead of 'messages')
 
   console.log("chartData:", chartData);
 
@@ -179,7 +177,15 @@ const ActivityChart = ({ actions, userCount }: { actions: Stats['actions'], user
           <YAxis 
             stroke="#888"
             yAxisId="left"
-            tickFormatter={(value) => `${value / 1000}k`}
+            domain={['auto', 'auto']} // This allows for negative values
+            tickFormatter={(value) => {
+              if (Math.abs(value) >= 1000000) {
+                return `${(value / 1000000).toFixed(1)}M`;
+              } else if (Math.abs(value) >= 1000) {
+                return `${(value / 1000).toFixed(1)}k`;
+              }
+              return value;
+            }}
           />
           <YAxis 
             stroke="#888"
@@ -223,7 +229,6 @@ const ActivityChart = ({ actions, userCount }: { actions: Stats['actions'], user
     </div>
   );
 };
-
 
 
 const RecentActivity = ({ actions }: { actions: Stats['actions'] }) => {
