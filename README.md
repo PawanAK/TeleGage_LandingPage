@@ -1,42 +1,63 @@
-# Dark SaaS Landing Page Starter Template
+# TeleGage - Landing Page and Dashboard
 
-This project is a starter template for the dark theme SaaS landing page project created by Frontend Tribe.
+TeleGage Supercharge Your Telegram Community .
 
-This project includes elements adapted from "SaaS Website UI Kit" by Framer. Retrieved from [Source Link](https://www.figma.com/community/file/1347551304372055519) (licensed under CC BY 4.0).
+## Features
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+- Responsive dark-themed landing page
+- User authentication (login and signup)
+- Dashboard for community management
+- Create and import community functionality
+- Integration with Aptos blockchain
+
+## Tech Stack
+
+- Next.js 14
+- React 18
+- TypeScript
+- Tailwind CSS
+- Framer Motion for animations
+- Radix UI for accessible components
+- Aptos Labs Wallet Adapter
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up environment variables:
+   Create a `.env.local` file in the root directory and add necessary environment variables.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## User Flow
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Landing Page: Users arrive at the home page, which showcases the product features, FAQs, and a call-to-action.
+2. Authentication: Users can sign up or log in via the auth page.
+3. Dashboard: After authentication, users are directed to the dashboard.
+4. Community Management: From the dashboard, users can:
+   - Create a new community
+   - Import an existing community
+   - View and manage their communities
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Project Structure
 
-## Learn More
+- `src/app`: Main application pages and routing
+- `src/components`: Reusable React components
+- `src/lib`: Utility functions and helpers
+- `public`: Static assets
 
-To learn more about Next.js, take a look at the following resources:
+## Customization
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You can start customizing the app by modifying the following files:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- `src/app/page.tsx`: Main landing page
+- `src/app/dashboard/page.tsx`: Dashboard page
+- `src/components`: Various components used throughout the app
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
