@@ -1,9 +1,9 @@
 "use client";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { TopicForm } from '@/components/TopicForm';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaCheck, FaTelegram } from 'react-icons/fa';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { TopicForm } from "@/components/TopicForm";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaArrowLeft, FaCheck, FaTelegram } from "react-icons/fa";
 
 interface Topic {
   topicName: string;
@@ -15,11 +15,11 @@ interface Topic {
 
 export default function ImportCommunityPage() {
   const [step, setStep] = useState(1);
-  const [groupLink, setGroupLink] = useState('');
+  const [groupLink, setGroupLink] = useState("");
   const [topics, setTopics] = useState<Topic[]>([]);
   const [showModal, setShowModal] = useState(true); // Set this to true initially
-  const [communityRules, setCommunityRules] = useState('');
-  const [communityInstructions, setCommunityInstructions] = useState('');
+  const [communityRules, setCommunityRules] = useState("");
+  const [communityInstructions, setCommunityInstructions] = useState("");
   const [isValidating, setIsValidating] = useState(false);
   const [nextId, setNextId] = useState(1000); // Start from 1000 to avoid conflicts with existing IDs
   const router = useRouter();
@@ -27,26 +27,29 @@ export default function ImportCommunityPage() {
   const handleGroupLinkSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsValidating(true);
-  
+
     // Extract the channel ID from the URL
     const channelIdMatch = groupLink.match(/\/c\/(\d+)/);
     const channelId = channelIdMatch ? channelIdMatch[1] : null;
-  
+
     if (!channelId) {
-      console.error('Invalid group link format');
+      console.error("Invalid group link format");
       setShowModal(true);
       setIsValidating(false);
       return;
     }
-  
+
     console.log(channelId);
-  
+
     try {
-      const response = await fetch('https://tegegageapplication.onrender.com//get_topics_by_community', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ telegram_channel_username: channelId }),
-      });
+      const response = await fetch(
+        "https://tegegageapplication.onrender.com//get_topics_by_community",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ telegram_channel_username: channelId }),
+        }
+      );
 
       const data = await response.json();
       console.log(data);
@@ -54,10 +57,10 @@ export default function ImportCommunityPage() {
       if (data.code === 200) {
         const initialTopics = data.Topics.map((topic: any) => ({
           topicName: topic.Name,
-          topicRules: '',
-          topicInstructions: '',
+          topicRules: "",
+          topicInstructions: "",
           id: topic.id,
-          status: 'Old'
+          status: "Old",
         }));
         setTopics(initialTopics);
         setStep(2);
@@ -65,18 +68,18 @@ export default function ImportCommunityPage() {
         setShowModal(true);
       }
     } catch (error) {
-      console.error('Error validating group:', error);
+      console.error("Error validating group:", error);
       setShowModal(true);
     } finally {
       setIsValidating(false);
     }
   };
-  
+
   const handleTopicSubmit = (data: Topic) => {
     const newTopic = {
       ...data,
       id: nextId,
-      status: 'New'
+      status: "New",
     };
     setTopics([...topics, newTopic]);
     setNextId(nextId + 1);
@@ -95,16 +98,16 @@ export default function ImportCommunityPage() {
   const handleFinish = async () => {
     const channelIdMatch = groupLink.match(/\/c\/(\d+)/);
     const channelId = channelIdMatch ? channelIdMatch[1] : null;
-    const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
+    const { walletAddress } = JSON.parse(localStorage.getItem("user") || "{}");
 
     const requestData = {
       telegram_channel_username: channelId,
       telegram_channel_rules: communityRules,
       telegram_channel_owner: walletAddress,
       telegram_channel_instructions: communityInstructions,
-      topics: topics.map(topic => ({
+      topics: topics.map((topic) => ({
         Name: topic.topicName,
-        Status: topic.status || 'New',
+        Status: topic.status || "New",
         ID: topic.id || undefined, // Use undefined for new topics without an ID
         Rules: topic.topicRules,
         Instructions: topic.topicInstructions,
@@ -113,37 +116,46 @@ export default function ImportCommunityPage() {
 
     console.log("Request Data:", requestData);
     try {
-      const response = await fetch('https://tegegageapplication.onrender.com//import_channel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
+      const response = await fetch(
+        "https://tegegageapplication.onrender.com//import_channel",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
 
       if (response.ok) {
-        console.log('Telegram channel updated successfully');
+        console.log("Telegram channel updated successfully");
 
         // Update the user's has_community field
         try {
-          await fetch('https://telegage-server.onrender.com/update_user_community_status', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ walletAddress: localStorage.getItem('petraAddress'), has_community: true }),
-          });
+          await fetch(
+            "https://telegage-server-8lhd.onrender.com/update_user_community_status",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                walletAddress: localStorage.getItem("petraAddress"),
+                has_community: true,
+              }),
+            }
+          );
         } catch (error) {
-          console.error('Error updating user community status:', error);
+          console.error("Error updating user community status:", error);
         }
 
-        router.push('/dashboard');
+        router.push("/dashboard");
       } else {
-        console.error('Failed to update Telegram channel');
+        console.error("Failed to update Telegram channel");
         // Handle error (e.g., show error message to user)
       }
     } catch (error) {
-      console.error('Error updating Telegram channel:', error);
+      console.error("Error updating Telegram channel:", error);
       // Handle error (e.g., show error message to user)
     }
   };
@@ -159,7 +171,10 @@ export default function ImportCommunityPage() {
     >
       <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-xl font-bold mb-4 text-indigo-300">Important!</h2>
-        <p className="text-white mb-6">Add @telegageman to your community and transfer ownership rights to him.</p>
+        <p className="text-white mb-6">
+          Add @telegageman to your community and transfer ownership rights to
+          him.
+        </p>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -186,7 +201,7 @@ export default function ImportCommunityPage() {
           transition={{ duration: 0.5 }}
           className="text-2xl font-bold mb-4 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text"
         >
-          {step === 1 ? 'Import Your Community' : 'Add Topics'}
+          {step === 1 ? "Import Your Community" : "Add Topics"}
         </motion.h1>
         <AnimatePresence>
           {showModal && <Modal onClose={() => setShowModal(false)} />}
@@ -203,7 +218,10 @@ export default function ImportCommunityPage() {
             {step === 1 ? (
               <form onSubmit={handleGroupLinkSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="groupLink" className="block text-sm font-semibold text-indigo-300 mb-1">
+                  <label
+                    htmlFor="groupLink"
+                    className="block text-sm font-semibold text-indigo-300 mb-1"
+                  >
                     <FaTelegram className="inline-block mr-2" />
                     Paste Your Group Link
                   </label>
@@ -219,7 +237,10 @@ export default function ImportCommunityPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="communityRules" className="block text-sm font-semibold text-indigo-300 mb-1">
+                  <label
+                    htmlFor="communityRules"
+                    className="block text-sm font-semibold text-indigo-300 mb-1"
+                  >
                     Community Rules
                   </label>
                   <textarea
@@ -234,7 +255,10 @@ export default function ImportCommunityPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="communityInstructions" className="block text-sm font-semibold text-indigo-300 mb-1">
+                  <label
+                    htmlFor="communityInstructions"
+                    className="block text-sm font-semibold text-indigo-300 mb-1"
+                  >
                     Community Instructions
                   </label>
                   <textarea
@@ -257,15 +281,15 @@ export default function ImportCommunityPage() {
                     disabled={isValidating}
                     className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300 text-sm font-bold shadow-lg"
                   >
-                    {isValidating ? 'Validating...' : 'Validate'}
+                    {isValidating ? "Validating..." : "Validate"}
                   </button>
                 </motion.div>
               </form>
             ) : (
               <>
-                <TopicForm 
-                  onSubmit={handleTopicSubmit} 
-                  topics={topics} 
+                <TopicForm
+                  onSubmit={handleTopicSubmit}
+                  topics={topics}
                   onRemove={handleTopicRemove}
                   onEdit={handleTopicEdit}
                 />

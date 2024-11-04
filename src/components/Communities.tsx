@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 interface Community {
   community_id: string;
@@ -22,10 +22,12 @@ export const Communities = () => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
-        const response = await axios.get('https://telegage-server.onrender.com/api/communities');
+        const response = await axios.get(
+          "https://telegage-server-8lhd.onrender.com/api/communities"
+        );
         setCommunities(response.data);
       } catch (error) {
-        console.error('Failed to fetch communities:', error);
+        console.error("Failed to fetch communities:", error);
       }
     };
 
@@ -36,8 +38,13 @@ export const Communities = () => {
     <div>
       <h2 className="text-2xl font-bold mb-4">Your Communities</h2>
       {communities.map((community) => (
-        <div key={community.community_id} className="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
-          <h3 className="text-xl font-semibold mb-4">Community ID: {community.community_id}</h3>
+        <div
+          key={community.community_id}
+          className="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg"
+        >
+          <h3 className="text-xl font-semibold mb-4">
+            Community ID: {community.community_id}
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="bg-gray-700 p-4 rounded-lg">
               <h4 className="font-semibold mb-2">Messages</h4>
@@ -66,7 +73,10 @@ export const Communities = () => {
               {community.actions.slice(0, 5).map((action, index) => (
                 <li key={index} className="bg-gray-700 p-2 rounded">
                   <p className="text-sm text-gray-300">{action.timestamp}</p>
-                  <p><span className="font-semibold">{action.username}</span>: {action.message}</p>
+                  <p>
+                    <span className="font-semibold">{action.username}</span>:{" "}
+                    {action.message}
+                  </p>
                 </li>
               ))}
             </ul>

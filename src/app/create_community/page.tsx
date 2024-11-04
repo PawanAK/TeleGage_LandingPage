@@ -1,11 +1,10 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { CommunityForm } from '@/components/CommunityForm';
-import { TopicForm } from '@/components/TopicForm';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaCheck } from 'react-icons/fa';
-
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { CommunityForm } from "@/components/CommunityForm";
+import { TopicForm } from "@/components/TopicForm";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaArrowLeft, FaCheck } from "react-icons/fa";
 
 export default function CreateCommunityPage() {
   const [step, setStep] = useState(1);
@@ -34,7 +33,7 @@ export default function CreateCommunityPage() {
   };
 
   const handleFinish = async () => {
-    const { walletAddress } = JSON.parse(localStorage.getItem('user') || '{}');
+    const { walletAddress } = JSON.parse(localStorage.getItem("user") || "{}");
     const requestData = {
       telegram_channel_title: communityData.communityName,
       telegram_channel_description: communityData.communityDescription,
@@ -42,52 +41,61 @@ export default function CreateCommunityPage() {
       telegram_channel_rules: communityData.communityRules,
       telegram_channel_instructions: communityData.communityInstructions,
       telegram_channel_owner: walletAddress,
-      topics: topics.map(topic => ({
+      topics: topics.map((topic) => ({
         Name: topic.topicName,
         Rules: topic.topicRules,
-        Instructions: topic.topicInstructions
-      }))
+        Instructions: topic.topicInstructions,
+      })),
     };
 
     console.log(requestData);
     try {
-      const response = await fetch('https://tegegageapplication.onrender.com/create_telegram_channel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
+      const response = await fetch(
+        "https://tegegageapplication.onrender.com/create_telegram_channel",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
 
       if (response.ok) {
-        console.log('Telegram channel created successfully');
-        
+        console.log("Telegram channel created successfully");
+
         // Update the user's has_community field
         try {
-          await fetch('https://telegage-server.onrender.com/update_user_community_status', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ walletAddress: localStorage.getItem('petraAddress'), has_community: true }),
-          });
+          await fetch(
+            "https://telegage-server-8lhd.onrender.com/update_user_community_status",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                walletAddress: localStorage.getItem("petraAddress"),
+                has_community: true,
+              }),
+            }
+          );
         } catch (error) {
-          console.error('Error updating user community status:', error);
+          console.error("Error updating user community status:", error);
         }
 
-        router.push('/dashboard');
+        router.push("/dashboard");
       } else {
-        console.error('Failed to create Telegram channel');
+        console.error("Failed to create Telegram channel");
         // Handle error (e.g., show error message to user)
       }
     } catch (error) {
-      console.error('Error creating Telegram channel:', error);
+      console.error("Error creating Telegram channel:", error);
       // Handle error (e.g., show error message to user)
     }
   };
 
   useEffect(() => {
-    console.log('Topics updated:', topics);
+    console.log("Topics updated:", topics);
   }, [topics]);
 
   const progressPercentage = step === 1 ? 50 : 100;
@@ -106,7 +114,7 @@ export default function CreateCommunityPage() {
           transition={{ duration: 0.5 }}
           className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-transparent bg-clip-text"
         >
-          {step === 1 ? 'Create Your Community' : 'Add Topics'}
+          {step === 1 ? "Create Your Community" : "Add Topics"}
         </motion.h1>
         <AnimatePresence mode="wait">
           <motion.div
@@ -121,10 +129,10 @@ export default function CreateCommunityPage() {
               <CommunityForm onSubmit={handleCommunitySubmit} />
             ) : (
               <>
-                <TopicForm 
-                  onSubmit={handleTopicSubmit} 
-                  topics={topics} 
-                  onRemove={handleTopicRemove} 
+                <TopicForm
+                  onSubmit={handleTopicSubmit}
+                  topics={topics}
+                  onRemove={handleTopicRemove}
                   onEdit={handleTopicEdit}
                 />
                 <div className="mt-4 flex justify-between">
