@@ -1,6 +1,6 @@
-# TeleGage - Dark SaaS Landing Page and Dashboard
+# TeleGage - Landing Page and Dashboard
 
-TeleGage is a modern SaaS application built with Next.js, featuring a dark-themed landing page and a powerful dashboard for community management.
+TeleGage Supercharge Your Telegram Community .
 
 ## Features
 
@@ -60,19 +60,3 @@ You can start customizing the app by modifying the following files:
 - `src/app/page.tsx`: Main landing page
 - `src/app/dashboard/page.tsx`: Dashboard page
 - `src/components`: Various components used throughout the app
-
-## Deployment
-
-This project is set up for easy deployment on Vercel. Connect your GitHub repository to Vercel for automatic deployments on every push to the main branch.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
-
-## Acknowledgements
-
-This project includes elements adapted from "SaaS Website UI Kit" by Framer. Retrieved from [Source Link](https://www.figma.com/community/file/1347551304372055519) (licensed under CC BY 4.0).
